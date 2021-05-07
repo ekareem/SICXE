@@ -24,7 +24,18 @@
  
   **ASSEMBLER**
   
-  py main.py -asm (filename)
+    py main.py -asm (filename)
+![](https://imgur.com/ex76hcI.png)
+
+  **RUN PROGRAM**
+
+  py main.py -run -a  (assembleyfile)
+  
+  or
+  
+  py main.py -run -o (objectfile)
+  
+![](https://imgur.com/QPTo1GM.png)
 
   **DEBUGGER**
   
@@ -34,10 +45,8 @@
   
   py main.py -bug -o (objectfile)
   
-  **RUN PROGRAM**
+![](https://imgur.com/ibBNjiG.png)
 
-  py main.py -run -a  (assembleyfile)
-  
-  or
-  
-  py main.py -run -o (objectfile)
+![](https://user-images.githubusercontent.com/76535260/117469418-b4627680-af23-11eb-98d1-84c12b1e39ee.png)
+
+
