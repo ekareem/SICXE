@@ -35,7 +35,7 @@
   
   py main.py -run -o (objectfile)
   
-![](https://imgur.com/QPTo1GM.png)
+![](https://imgur.com/ITbkqFc.png)
 
   **DEBUGGER**
   
