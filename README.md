@@ -1,5 +1,7 @@
 # SICXE
 
+[Demo](https://www.youtube.com/watch?v=tYYF0TpKkwg)
+
 **how to run** 
     
   py main.py (args)
