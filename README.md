@@ -4,7 +4,7 @@
 
 **how to run** 
   
-  language: pyhton3
+  language: python3
   
   py main.py (args) or python3 main.py (args) or python main.py (args)
   
