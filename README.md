@@ -4,8 +4,8 @@
 
 **how to run** 
     
-  py main.py (args)
-   
+  py main.py (args) or python3 main.py (args) or py main.py (args)
+  
   get help
 
   py main.py help
