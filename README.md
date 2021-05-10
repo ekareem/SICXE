@@ -3,8 +3,10 @@
 [Demo](https://www.youtube.com/watch?v=tYYF0TpKkwg)
 
 **how to run** 
-    
-  py main.py (args) or python3 main.py (args) or py main.py (args)
+  
+  language: pyhton3
+  
+  py main.py (args) or python3 main.py (args) or python main.py (args)
   
   get help
 
