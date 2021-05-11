@@ -210,7 +210,7 @@ def getDisp(instr: bytearray):
     return xbpedisp & 0xfff
 
 
-def getTargetAddress(instr: bytearray, pc, b, x, mem):
+def getTargetAddress(instr: bytearray, pc, b, x, mem, isDisas=False):
     if getFormat(instr) < 3:
         raise Exception('instruction must be of format 3 or greater to have a target address')
 
@@ -223,6 +223,9 @@ def getTargetAddress(instr: bytearray, pc, b, x, mem):
             ta = ta + b
         if isPcInstr(instr):
             ta = pc + ta.get(True)
+
+    if isDisas:
+        return ta
 
     if isIndirectInstr(instr):
         ta = mem.getword(int(ta), False, 'SICWORD')

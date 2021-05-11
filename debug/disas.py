@@ -109,7 +109,7 @@ class InstructionF3m(InstructionF3):
         operand = getDisp(self.instr)
         nixpbe = nixbpeToStringInstr(self.instr)
         p = INT(self.loc + len(self.instr), 24, False)
-        ta = getTargetAddress(self.instr, p, register.B, register.X,self.cu.mem)
+        ta = getTargetAddress(self.instr, p, register.B, register.X, self.cu.mem, isDisas=True)
         out = nixpbe + ' ' + self.form.format(extended, self.mnemonic, immidiate, inDirect, operand, pc, base, index)
 
         f = ' ' * (44 - len(out))
@@ -120,7 +120,7 @@ class InstructionF3m(InstructionF3):
         if isDirectInstr(self.instr) or isSicInstr(self.instr):
             mode = ['(', ')']
         if isIndirectInstr(self.instr):
-            mode = ['(', ')']
+            mode = ['((', '))']
         if isImidiateInstr(self.instr):
             mode = ['', '']
         return f'{mode[0]}0x{ta.dec:X}{mode[1]}'

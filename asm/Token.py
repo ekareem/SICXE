@@ -231,14 +231,15 @@ class Operand(Token):
         if token in symtab.table:
             if asbyte:
                 if asFloat:
-                    return floatToBytearray(float(symtab[token].getAddr()), SICXE_SIZE_BIT_EXPONENT, SICXE_SIZE_BIT_MANTISSA)
+                    return floatToBytearray(float(symtab[token].getAddr()), SICXE_SIZE_BIT_EXPONENT,
+                                            SICXE_SIZE_BIT_MANTISSA)
                 return toNumber(str(symtab[token].getAddr()), nbits, asbyte)
             return symtab[token].getAddr()
         # print(self.line.label.token, self.line.operator.token, self.token)
         # print(token,nbits,asbyte)
         n = token
         if asFloat and isdigit(token):
-                n = toNumber(token, nbits, False)
+            n = toNumber(token, nbits, False)
         if asFloat and asbyte:
             return floatToBytearray(float(n), SICXE_SIZE_BIT_EXPONENT, SICXE_SIZE_BIT_MANTISSA)
         if asFloat:

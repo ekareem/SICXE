@@ -3,7 +3,7 @@ from typing import List
 
 from debug.command.command import Command, UnaryCommand, BinaryCommand
 from debug.disas import getInstruction
-from util import  SICXE_SIZE_BIT_WORD, intToDec, decToInt, intToBytearray,SICXE_SIZE_BIT_MANTISSA, \
+from util import SICXE_SIZE_BIT_WORD, intToDec, decToInt, intToBytearray, SICXE_SIZE_BIT_MANTISSA, \
     SICXE_SIZE_BIT_EXPONENT, decToFloat
 from vm import CU
 
@@ -96,10 +96,10 @@ class AddrToCharPoint(DecTo):
         addr = num
         byte = self.cu.mem.getbyte(addr)
         string = bytearray()
-        while 0x20 <= byte <= 0x7f:
+        while byte != 0:  # 0x20 <= byte <= 0x7f:
             string.append(byte)
-            byte = self.cu.mem.getbyte(addr)
             addr += 1
+            byte = self.cu.mem.getbyte(addr)
 
         return f'"{string.decode(encoding="utf-8")}"'
 

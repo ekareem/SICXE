@@ -17,7 +17,7 @@ class StringToNum(Command):
         super().__init__()
         self.string = string
 
-    def execute(self, asBytes=False):
+    def execute(self, asBytes=False,nbyte=None):
         if asBytes is None:
             return self.string
 
