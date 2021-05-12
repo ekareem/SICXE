@@ -1,7 +1,7 @@
 from typing import Dict, Union
 
 from asm.block import Block
-from asm.storage import Storage, Literal,Symbol
+from asm.storage import Storage, Literal, Symbol, ADDR
 
 
 class Table:
@@ -21,7 +21,8 @@ class Table:
         string = f'{"name":<10} {"address":<6} {"value":<10}\n'
         for elem in self.table:
             string += f'{elem:<10} {str(hex(self.table[elem].addr).replace("0x","") if not self.table[elem].addr is None else "------"):0>6}' \
-                      f' {str(self.table[elem].value if not self.table[elem].value is None else ""):<10}\n'
+                      f' {str(self.table[elem].value if not self.table[elem].value is not None else ""):<10}' \
+                      f'{"addr" if self.table[elem].group == ADDR else "const"}\n'
         return string
 
     def __str__(self):

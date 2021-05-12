@@ -55,9 +55,9 @@ tie		LDA	#tieStr		. print tie result
 halt		J	halt
 
 moves		WORD	0
-winStr		BYTE	C' wins'
+winStr		BYTE	C' winsn'
 endWinStr	BYTE	0
-tieStr		BYTE	C'It is a tie'
+tieStr		BYTE	C'It is a tien'
 endTieStr	BYTE	0
 
 
@@ -80,7 +80,7 @@ echonl	STA	@stackptr	. push A
 . write C-style string on address in A to stdout
 echostr	STA	addr
 
-char	LDCH	@addr	. while character != 0 print character,increase ptr
+char	LDCH	@addr	. while character != 0 print character, increase ptr
 	AND	#255
 	COMP	#0
 	JEQ	return
@@ -135,7 +135,7 @@ printBoard	STL	@stackptr	. push L
 		CLEAR	X
 			
 		. print lines in a loop
-printLine	LDCH	board,X	. load left token,print it
+printLine	LDCH	board,X	. load left token, print it
 		JSUB	printCell
 		LDA	#1		. X++
 		ADDR	A,X
@@ -143,7 +143,7 @@ printLine	LDCH	board,X	. load left token,print it
 		LDCH	#124		. print |
 		WD	stdout
 
-		LDCH	board,X	. load middle token,print it
+		LDCH	board,X	. load middle token, print it
 		JSUB	printCell
 		LDA	#1		. X++
 		ADDR	A,X
@@ -151,7 +151,7 @@ printLine	LDCH	board,X	. load left token,print it
 		LDCH	#124		. print |
 		WD	stdout
 
-		LDCH	board,X	. load right token,print it
+		LDCH	board,X	. load right token, print it
 		JSUB	printCell
 		LDA	#1		. X++
 		ADDR	A,X
@@ -160,8 +160,8 @@ printLine	LDCH	board,X	. load left token,print it
 
 		LDA	#8		. last line?
 		COMPR	X,A
-		JGT	endBoard	. yes,go to end
-		JSUB	printDashLine	. no,print dash line
+		JGT	endBoard	. yes, go to end
+		JSUB	printDashLine	. no, print dash line
 		J	printLine
 
 endBoard	JSUB	stackpop	. pop X
@@ -174,7 +174,7 @@ endBoard	JSUB	stackpop	. pop X
 
 
 . Print instructions for game. Routine overwrites global variable
-. board,with values 0 - 8.
+. board, with values 0 - 8.
 printInstr	STL	@stackptr	. push L
 		JSUB	stackpush
 		STA	@stackptr	. push A
@@ -240,24 +240,24 @@ instr0		BYTE	C'Welcome to Tic Tac Toe!'
 endinstr0	BYTE	0
 instr1		BYTE	C'Board cells are numbered as follows:'
 endinstr1	BYTE	0
-instr2		BYTE	C'When prompted,type in a cell number to'
+instr2		BYTE	C'When prompted, type in a cell number to'
 endinstr2	BYTE	0
-instr3		BYTE	C'place your token there'
+instr3		BYTE	C'place your token theren'
 endinstr3	BYTE	0
 instr4		BYTE	C'When entering cell number PLEASE enter only'
 endinstr4	BYTE	0
-instr5		BYTE	C'one digit or you will break the program'
+instr5		BYTE	C'one digit or you will break the programn'
 endinstr5	BYTE	0
-instr6		BYTE	C'Player 1 is X and player 2 is O'
+instr6		BYTE	C'Player 1 is X and player 2 is On'
 endinstr6	BYTE	0
-instr7		BYTE	C'Press ENTER to continue'
+instr7		BYTE	C'Press ENTER to continue nnn'
 endinstr7	BYTE	0
 cellNum		RESW	1
 
 
-. Return board index (0-8) in A. Function is not robust,it expects
+. Return board index (0-8) in A. Function is not robust, it expects
 . only one character entered on every prompt. If more or less is
-. given,program will behave incorrectly.
+. given, program will behave incorrectly.
 getMove		STL	@stackptr	. push L
 		JSUB	stackpush
 
@@ -273,12 +273,12 @@ getIndex	LDA	#prompt		. print question
 		JLT	rangeError
 		COMP	#56
 		JGT	rangeError
-		SUB	#48		. right ascii num,convert to int
+		SUB	#48		. right ascii num, convert to int
 		RMO	A,X		. check if this cell is taken
 		LDCH	board,X
 		COMP	#32		. error if different from SPACE
 		JGT	takenError	
-		RMO	X,A		. not taken,copy index back to A
+		RMO	X,A		. not taken, copy index back to A
 		J	endMove
 
 rangeError	LDA	#rangeMsg
@@ -294,9 +294,9 @@ endMove		JSUB	stackpop	. pop L
 		RSUB
 prompt		BYTE	C'Enter a digit (0-8): '
 endPrompt	BYTE	0
-rangeMsg	BYTE	C'Invalid input '
+rangeMsg	BYTE	C'Invalid inputn '
 endRangeMsg	BYTE	0
-takenMsg	BYTE	C'Space is already taken '
+takenMsg	BYTE	C'Space is already takenn '
 endTakenMsg	BYTE	0
 
 
@@ -379,7 +379,7 @@ nextIndex	LDX	positionIx	. get next index for position
 		LDA	positionIx	. compare if last index
 		COMP	#3
 		JLT	nextIndex	. loop if not last
-		CLEAR	A		. last element,equal all previous
+		CLEAR	A		. last element, equal all previous
 		RMO	S,A		. so this is winner; return it
 		J	returnWinner
 
@@ -389,7 +389,7 @@ increasePosPtr	LDA	positionPtr	. increase pos pointer
 		SUB	#winPositions	. compare if over last pos
 		COMP	#24
 		JLT	nextPosition
-		LDA	#32		. over last pos,return SPACE
+		LDA	#32		. over last pos, return SPACE
 
 returnWinner	JSUB	stackpop	. pop X
 		LDX	@stackptr
@@ -466,7 +466,7 @@ tempa		RESW	1		. variable used in routines
 board		BYTE	C'         '
 player		RESB	1
 computer	RESB	1
-stdin		BYTE	0
-stdout		BYTE	1
+stdin		BYTE	0xf1
+stdout		BYTE	0x05
 stackptr	RESW	1
 stack		RESW	100	. stack size is 100 words

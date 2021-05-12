@@ -94,7 +94,7 @@ def divrr(register1: Union[INT, FLOAT], register2: Union[INT, FLOAT]):
 
 
 def shiftl(register1: Union[INT, FLOAT], number: int):
-    register1.lshift(number, setSelf=True)
+    register1.clshift(number, setSelf=True)
 
 
 def shiftr(register1: Union[INT, FLOAT], number: int):

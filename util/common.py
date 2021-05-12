@@ -65,6 +65,16 @@ def infixToPostfix(string):
     return postfix
 
 
+def isFloat(num: str):
+    if num.find('.') == -1:
+        return False
+    try:
+        float(num)
+        return True
+    except:
+        return False
+
+
 def infixToPostfixx(infixexpr):
     prec = {}
     prec["*"] = 3
@@ -96,16 +106,6 @@ def infixToPostfixx(infixexpr):
     while not len(opStack) == 0:
         postfixList.append(opStack.pop())
     return postfixList
-
-
-def isFloat(num: str):
-    if num.find('.') == -1:
-        return False
-    try:
-        float(num)
-        return True
-    except:
-        return False
 
 
 def tokenize(string, add=()):
@@ -435,15 +435,9 @@ def decToFitNbit(dec, nbits, sum=0):
     return sum
 
 
-if __name__ == '__main__':
-    a = infixToPostfixx("1.2-1.2")
-    b = infixToPostfix("12-11+2")
-    c = tokenizeExpr('**THREE+TWO*2')
-    d = decToFloat(0x100ee66666, 11, 36)
-    print(a)
-    print(b)
-    print(c)
-    print(d, 2 + 1.5 + 2.3)
-    print(hex(floatToDec(5.81, 11, 36)))
-    print(hex(intToDec(-11, 12)))
-    print(hex(decToInt(0xFF2, 12)))
+def leftRotate(number, shift, nbits):
+    return ((number << shift % nbits) | (number >> (nbits - shift % nbits))) & ((1 << nbits) - 1)
+
+
+def rightRotate(number, shift, nbits):
+    return (number >> shift % nbits) | (number << (nbits - shift % nbits)) & ((1 << nbits) - 1)

@@ -160,8 +160,8 @@ class CU:
                     isImidiateInstr(self.instruction))
 
     def compr(self):
-        alu.comprr(getRegister1(self.instruction),
-                   getRegister2(self.instruction),
+        alu.comprr(reg.getRegister(getRegister1(self.instruction)),
+                   reg.getRegister(getRegister2(self.instruction)),
                    reg.getRegister(reg.SICXE_NUM_REGISTER_SW))
 
     def div(self):

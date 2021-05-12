@@ -1,15 +1,9 @@
-# This is a sample Python script.
 from typing import List
 
 from asm import Program
 from debug import Debugger
 import sys
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-# Press the green button in the gutter to run the script.
 from loader import load
 from vm import BUS
 from vm.presistance import memoryWrite, MEMORYFILE, readToMemory
@@ -22,10 +16,12 @@ def assemble(file: str, obj=None, tab=None, cod=None, asClass=False):
             f = file[:file.find('.')]
 
         p = Program()
+
         p.parse(file)
         p.execute()
+
         if asClass:
-            return p.sections[0].objectCode
+            return p.sections[0].objectCode, p.sections[0].symtab, p.sections[0].datum
 
         obj = f + '.obj' if obj is None else obj
         p.writeObj(obj)
@@ -33,7 +29,10 @@ def assemble(file: str, obj=None, tab=None, cod=None, asClass=False):
         p.writeTab(tab)
         cod = f + '.cod' if cod is None else cod
         p.writeCode(cod)
+
         return [obj, tab, cod]
+
+
     except BaseException as e:
         print(e)
 
@@ -42,14 +41,16 @@ def debug(file: str, isAsm=False, memoryFile=None):
     b = BUS()
     if memoryFile is not None:
         readToMemory(b.cu, memoryFile)
+    symtab = None
+    datatab = None
     if file is not None:
         if isAsm:
-            obj = assemble(file, asClass=True)
+            obj, symtab, datatab = assemble(file, asClass=True)
             load(b.cu, None, objectCode=obj)
         else:
             load(b.cu, file)
 
-    d = Debugger(b.cu)
+    d = Debugger(b.cu, symtab, datatab=datatab)
     n = ''
     while n.strip() != 'exit':
         try:
@@ -58,7 +59,7 @@ def debug(file: str, isAsm=False, memoryFile=None):
                 c = d.evaluate(n)
                 c.execute()
         except BaseException as e:
-            print(e)
+           print(e)
 
 
 def run(file: str, isAsm=False, memfile=None, loadFile=None):
@@ -69,13 +70,11 @@ def run(file: str, isAsm=False, memfile=None, loadFile=None):
             readToMemory(b.cu, loadFile)
 
         if isAsm:
-            obj = assemble(file, asClass=True)
+            obj = assemble(file, asClass=True)[0]
             load(b.cu, None, objectCode=obj)
         else:
             load(b.cu, file)
 
-        #d = Debugger(b.cu)
-        #d.evaluate('run').execute()
         b.cu.runall()
         if memfile is not None:
             memoryWrite(b.cu, memfile)
@@ -200,5 +199,3 @@ if __name__ == '__main__':
             mem = args[i] if len(args) > i else MEMORYFILE
 
         run(file, asAsm, mem)
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/

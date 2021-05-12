@@ -3,10 +3,10 @@ from typing import List
 
 from asm.code import codeF1, codeF2, codeF3
 from asm.mnemonics import OPCODE, DIRECTIVE
-from asm.storage import Symbol, Literal
+from asm.storage import Symbol, Literal, CONST
 from asm.lexutil import LOCAL, getHead, toNumber, isdigit, isExpression, isFloat
 from util import intToBytearray, tokenize, isMul, infixToPostfixx, floatToBytearray, SICFLOAT, \
-    SICXE_SIZE_BIT_EXPONENT, SICXE_SIZE_BIT_MANTISSA
+    SICXE_SIZE_BIT_EXPONENT, SICXE_SIZE_BIT_MANTISSA, SICXE_SIZE_BYTE_WORD, SICXE_SIZE_BYTE_FLOAT, SICXE_SIZE_BYTE_BYTE
 
 
 class Token:
@@ -390,6 +390,7 @@ class Start(Directive):
 
         if self.line.label is not None:
             self.line.block.section.name = self.line.label.token
+            self.line.block.section.symtab[self.line.label.token].group = CONST
 
         self.line.block.section.start = operand
         headblock: 'Block' = getHead(self.line.block)
@@ -412,6 +413,15 @@ class Res(Directive):
         # print(self.line.label.token,self.token,type(operands[0]), operands[0].token)
         return operand * self.nbyte
 
+    # change
+    def getObjectCode(self, toInt=False):
+        length = self.line.operands[0].execute(24, False)
+        addr = self.line.addr
+        for i in range(addr, addr + (length * self.nbyte), self.nbyte):
+            self.line.block.section.datum[i] = self.nbyte
+
+        return super().getObjectCode(toInt)
+
 
 class Byte(Directive):
     def __init__(self, token: str, line: 'Line'):
@@ -427,6 +437,11 @@ class Byte(Directive):
         return len(operand) * 1
 
     def getObjectCode(self, toInt=None):
+        length = self.length()
+        addr = self.line.addr
+        # for i in range(addr, addr + length):
+        self.line.block.section.datum[addr] = length  # SICXE_SIZE_BYTE_BYTE
+
         operands = self.line.operands
         operand = 0
         if operands is None or len(operands.operands) != 1:
@@ -448,6 +463,7 @@ class Word(Directive):
         return 3
 
     def getObjectCode(self, toInt=None):
+        self.line.block.section.datum[self.line.addr] = SICXE_SIZE_BYTE_WORD
         operands = self.line.operands
         if operands is None or len(operands.operands) != 1:
             raise Exception('missing operand')
@@ -467,6 +483,7 @@ class Float(Directive):
         return 6
 
     def getObjectCode(self, toInt=False):
+        self.line.block.section.datum[self.line.addr] = SICXE_SIZE_BYTE_FLOAT
         operands = self.line.operands
         if operands is None or len(operands.operands) != 1:
             raise Exception('missing operand')
@@ -522,6 +539,7 @@ class Equ(Directive):
         val = self.line.operands.operands[0].execute(24, False)
         symbol.addr = val
         symbol.value = val
+        symbol.group = CONST
 
 
 class Extdef(Directive):

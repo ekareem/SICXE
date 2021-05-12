@@ -10,4 +10,11 @@ class ExprCommand(BinaryCommand):
     def execute(self, inputs=None) -> any:
         if self.token == '+':
             return self.right.execute() + self.left.execute()
-        return self.right.execute() - self.left.execute()
+        if self.token == '-':
+            return self.right.execute() - self.left.execute()
+        if self.token == '%':
+            return self.right.execute() % self.left.execute()
+        if self.token == '/':
+            return self.right.execute() / self.left.execute()
+        if self.token == '*':
+            return self.right.execute() * self.left.execute()

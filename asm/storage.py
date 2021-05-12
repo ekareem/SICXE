@@ -2,11 +2,15 @@ from typing import Union
 
 from asm.lexutil import toNumber
 
+CONST = 1
+ADDR = 2
+
 
 class Storage:
-    def __init__(self, id: str, addr: int = None, value: Union[int, str] = None):
+    def __init__(self, id: str, addr: int = None, value: Union[int, str] = None, group: int = ADDR):
         self.id = id
         self.addr = addr
+        self.group = group
         if self.id.find('=') == 0:
             self.value = id.replace('=', '')
         else:
@@ -29,15 +33,15 @@ class Storage:
         return toNumber("0", nbit, asByte)
 
     def __str__(self):
-        return f'{self.addr} {self.value}'
+        return f'{self.addr} {self.value} {"address" if self.group == ADDR else "const"}'
 
 
 class Symbol(Storage):
-    def __init__(self, scope: int, id: str, addr: int = None, value: Union[int, bytearray] = None):
-        super().__init__(id, addr, value)
+    def __init__(self, scope: int, id: str, addr: int = None, value: Union[int, bytearray] = None, group: int = ADDR):
+        super().__init__(id, addr, value,group)
         self.scope = scope
 
 
 class Literal(Storage):
-    def __init__(self, id: str, addr: int = None, value: Union[int, bytearray] = None):
-        super().__init__(id, addr, value)
+    def __init__(self, id: str, addr: int = None, value: Union[int, bytearray] = None, group: int = ADDR):
+        super().__init__(id, addr, value,group)

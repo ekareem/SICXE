@@ -1,5 +1,6 @@
 from typing import List
 
+from asm import SYMTAB
 from debug.command.exprcommand import ExprCommand
 from debug.utildubug import stringToReg, stringToInt
 from debug.breakpoint import BreakPoint
@@ -14,7 +15,7 @@ from debug.command.printcommand import PrintCommand, PrintRegisters, PrintMemory
 from debug.command.registercommand import getRegisterVal, getMemoryVal
 from debug.command.setcommand import SetRegister, SetCC, SetCH, Save, Read, Load
 from debug.disas import Disasembler
-from util import infixToPostfix
+from util import infixToPostfix, infixToPostfixx
 from vm import CU
 
 
@@ -30,14 +31,14 @@ class Builder:
         sn = StringToNum(string)
         self.stack.append(sn)
 
-    def buildRun(self, cu: CU, bp: BreakPoint, show=False):
+    def buildRun(self, cu: CU, bp: BreakPoint, show=False, symtab=None, datatab=None):
         ms = self.stack.pop() if len(self.stack) > 0 else None
-        r = Run(cu, bp, ms, show)
+        r = Run(cu, bp, ms, show,symtab,datatab)
         self.stack.append(r)
 
-    def buildNexti(self, cu: CU, bp: BreakPoint, show=False):
+    def buildNexti(self, cu: CU, bp: BreakPoint, show=False, symtab=None, datatab=None):
         num = self.stack.pop() if len(self.stack) > 0 else None
-        n = Nexti(cu, bp, num, show)
+        n = Nexti(cu, bp, num, show, symtab, datatab)
         self.stack.append(n)
 
     def buildBreak(self, bp: BreakPoint):
@@ -122,9 +123,9 @@ class Builder:
         d = DecToFloat(num)
         self.stack.append(d)
 
-    def buildToInstr(self, cu: CU):
+    def buildToInstr(self, cu: CU, symtab=None, datatab=None):
         num = self.stack.pop() if len(self.stack) > 0 else None
-        d = DecToInstr(cu, num)
+        d = DecToInstr(cu, num, symtab, datatab)
         self.stack.append(d)
 
     def buildSet(self):
@@ -158,17 +159,17 @@ class Builder:
         self.buildPrint()
         return self.stack[0]
 
-    def buildExpr(self, cu: CU, token):
-        postfix = infixToPostfix(token)
-        for token in reversed(postfix):
+    def buildExpr(self, cu: CU, token, symtab: SYMTAB):
+        postfix = infixToPostfixx(token)
+        for token in postfix:
             if token.lower() in stringToReg:
                 self.buildRegisterVal(cu, stringToReg[token.lower()])
-            elif token in ('-', '+'):
+            elif token in ('-', '+', '*', '/', '%'):
                 self.buildSum(token)
             elif token.lower() in stringToReg:
                 self.buildRegisterVal(cu, stringToReg[token.lower()])
             else:
-                num = stringToInt(token)
+                num = stringToInt(token, symtab)
                 self.buildNumber(num) if num is not None \
                     else self.buildStringToNum(token)
 

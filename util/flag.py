@@ -15,7 +15,7 @@ flagmap = {
     DIRECT: '',
     INDIRECT: '@',
     IMMIDIATE: '#',
-    INDEX: '+(X)',
+    INDEX: ',(X)',
     BASE: '+(B)',
     PC: '+(PC)',
     EXTENDED: '+',

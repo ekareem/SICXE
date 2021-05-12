@@ -1,5 +1,6 @@
-from typing import List
+from typing import List, Dict
 
+from asm import SYMTAB
 from debug.breakpoint import BreakPoint
 from debug.builder import Builder
 import debug.command.token as tk
@@ -11,11 +12,13 @@ from vm.presistance import MEMORYFILE
 
 
 class Debugger:
-    def __init__(self, cu: CU):
+    def __init__(self, cu: CU, symtab: SYMTAB = None, datatab: Dict[int, int] = None):
         self.builder = Builder()
         self.bp = BreakPoint()
         self.cu = cu
-        self.dis = Disasembler(self.cu, self.bp)
+        self.dis = Disasembler(self.cu, self.bp, symtab, datatab=datatab)
+        self.symtab = symtab
+        self.datatab = datatab
 
     def evaluate(self, statement: str):
 
@@ -43,13 +46,13 @@ class Debugger:
                 if token.lower() in tk.RUN:
                     self.builder.buildRun(self.cu, self.bp)
                 elif token.lower() in tk.RUNI:
-                    self.builder.buildRun(self.cu, self.bp, True)
+                    self.builder.buildRun(self.cu, self.bp, True, self.symtab, self.datatab)
                 elif token.lower() in stringToReg:
                     self.builder.buildRegisterVal(self.cu, stringToReg[token.lower()])
                 elif token.lower() in tk.NEXT:
                     self.builder.buildNexti(self.cu, self.bp)
                 elif token.lower() in tk.NEXTI:
-                    self.builder.buildNexti(self.cu, self.bp, True)
+                    self.builder.buildNexti(self.cu, self.bp, True, self.symtab, self.datatab)
                 elif token.lower() in tk.BREAK:
                     self.builder.buildBreak(self.bp)
                 elif token.lower() in tk.BREAK:
@@ -83,7 +86,7 @@ class Debugger:
                 elif token.lower() in tk.TOFLOAT:
                     self.builder.buildDecToFloat()
                 elif token.lower() in tk.TOINSTRUCTION:
-                    self.builder.buildToInstr(self.cu)
+                    self.builder.buildToInstr(self.cu, self.symtab, self.datatab)
                 elif token.lower() in tk.SET:
                     self.builder.buildSet()
                 elif token.lower() in tk.SETCC:
@@ -91,9 +94,9 @@ class Debugger:
                 elif token.lower() in tk.SETCH:
                     self.builder.buildSetCH()
                 elif isExpression(token):
-                    self.builder.buildExpr(self.cu, token)
+                    self.builder.buildExpr(self.cu, token, self.symtab)
                 else:
-                    num = stringToInt(token)
+                    num = stringToInt(token, self.symtab)
                     self.builder.buildNumber(num) if num is not None \
                         else self.builder.buildStringToNum(token)
 

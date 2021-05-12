@@ -1,4 +1,6 @@
-from asm.storage import Symbol
+from typing import Dict
+
+from asm.storage import Symbol, CONST
 
 from asm.Line import Line
 from asm.block import Block
@@ -22,21 +24,22 @@ class Section:
         self.line: Line = None
         self.currentBlock: Block = None
         self.currentLine: Line = None
+        self.datum: Dict[int, str] = {}
         self.onCreate()
 
     def programLength(self):
         return self.line.lengthAll()
 
     def onCreate(self):
-        self.symtab['A'] = Symbol(LOCAL, 'A', 0, 0)
-        self.symtab['X'] = Symbol(LOCAL, 'X', 1, 1)
-        self.symtab['L'] = Symbol(LOCAL, 'L', 2, 2)
-        self.symtab['P'] = Symbol(LOCAL, 'P', 8, 8)
-        self.symtab['SW'] = Symbol(LOCAL, 'SW', 9, 9)
-        self.symtab['B'] = Symbol(LOCAL, 'B', 3, 3)
-        self.symtab['S'] = Symbol(LOCAL, 'S', 4, 4)
-        self.symtab['T'] = Symbol(LOCAL, 'T', 5, 5)
-        self.symtab['F'] = Symbol(LOCAL, 'F', 6, 6)
+        self.symtab['A'] = Symbol(LOCAL, 'A', 0, 0, CONST)
+        self.symtab['X'] = Symbol(LOCAL, 'X', 1, 1, CONST)
+        self.symtab['L'] = Symbol(LOCAL, 'L', 2, 2, CONST)
+        self.symtab['P'] = Symbol(LOCAL, 'P', 8, 8, CONST)
+        self.symtab['SW'] = Symbol(LOCAL, 'SW', 9, 9, CONST)
+        self.symtab['B'] = Symbol(LOCAL, 'B', 3, 3, CONST)
+        self.symtab['S'] = Symbol(LOCAL, 'S', 4, 4, CONST)
+        self.symtab['T'] = Symbol(LOCAL, 'T', 5, 5, CONST)
+        self.symtab['F'] = Symbol(LOCAL, 'F', 6, 6, CONST)
 
     def setblock(self, id: str):
         if id not in self.bloctab.table:

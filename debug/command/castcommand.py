@@ -47,7 +47,7 @@ class DecToChar(DecTo):
         # return ord(b[len(b) - 1])
         string = "'"
         for i in intToBytearray(dec, nbyte):
-            string += chr(i)
+            string += (chr(i))
         string += "'"
         return string
 
@@ -79,12 +79,14 @@ class DecToFloat(DecTo):
 
 
 class DecToInstr(DecTo):
-    def __init__(self, cu: CU, child: Command = None):
+    def __init__(self, cu: CU, child: Command = None, symtab=None, datatab=None):
         super().__init__(child)
         self.cu = cu
+        self.symtab = symtab
+        self.datatab = datatab
 
     def cast(self, num: float):
-        return str(getInstruction(num, self.cu))
+        return str(getInstruction(num, self.cu, self.symtab, self.datatab))
 
 
 class AddrToCharPoint(DecTo):

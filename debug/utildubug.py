@@ -1,3 +1,4 @@
+from asm import SYMTAB
 from vm import SICXE_NUM_REGISTER_A, SICXE_NUM_REGISTER_X, SICXE_NUM_REGISTER_L, SICXE_NUM_REGISTER_B, \
     SICXE_NUM_REGISTER_T, SICXE_NUM_REGISTER_S, SICXE_NUM_REGISTER_F, SICXE_NUM_REGISTER_PC, SICXE_NUM_REGISTER_SW
 
@@ -30,11 +31,14 @@ stringToReg = {
 }
 
 
-def stringToInt(token):
+def stringToInt(token, symtab: SYMTAB = None):
     toke = token.strip()
 
     if toke.lower() in registerToInt:
         return registerToInt[toke.lower()]
+
+    if symtab is not None and toke in symtab.table:
+        return symtab[toke].addr
 
     if toke.find('0x') != -1:
         return int(token, 16)

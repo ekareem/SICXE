@@ -215,7 +215,7 @@ INTRO	BYTE	C'Please input your first PIN (Note--the length of your PIN<=15):'
 P2INTRO BYTE	C'Please input your second PIN of length 9 (only digits):'
 	BYTE	X'00'
 SUCCESS BYTE	C'GREAT!! You have deciphered both of your PINs successfully!!'
-		X'0A'
+	BYTE	X'0A'
 	BYTE	X'00'
 FMSG	BYTE	C'Failure'
 	BYTE	X'0A'
@@ -223,12 +223,11 @@ FMSG	BYTE	C'Failure'
 
 PIN1	BYTE	C'kc4360715829'
 	BYTE	X'00'
-
 PIN1LEN	WORD	*-PIN1-1
 
 PIN2LEN	WORD	9
 
 CHRLEN	WORD	0		.lenth of string
-BUFFER	RESW	100
+BUFFER	RESB	100
 
 	END	P1PR

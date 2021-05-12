@@ -96,6 +96,11 @@ class NUM:
         val = self.dec << operand
         return self.output(val, toCLS, setSelf, signed)
 
+    def clshift(self, other, toCLS=True, setSelf=False, signed=None):
+        operand = other.dec if issubclass(type(other), NUM) else other
+        val = leftRotate(self.dec, operand, self.nbits)
+        return self.output(val, toCLS, setSelf, signed)
+
     def __lshift__(self, other):
         return self.lshift(other, True)
 
@@ -141,6 +146,11 @@ class NUM:
     def rshift(self, other, toCLS=True, setSelf=False, signed=None):
         operand = other.dec if issubclass(type(other), NUM) else other
         val = self.dec >> operand
+        return self.output(val, toCLS, setSelf, signed)
+
+    def crshift(self, other, toCLS=True, setSelf=False, signed=None):
+        operand = other.dec if issubclass(type(other), NUM) else other
+        val = rightRotate(self.dec, operand, self.nbits)
         return self.output(val, toCLS, setSelf, signed)
 
     def __rshift__(self, other):
