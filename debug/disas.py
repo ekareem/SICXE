@@ -9,7 +9,7 @@ from vm import CU, SICXE_NUM_REGISTER_PC, register
 
 
 class Instruction:
-    def __init__(self, cu: CU, loc: int, instr: bytearray, symtab: SYMTAB=None):
+    def __init__(self, cu: CU, loc: int, instr: bytearray, symtab: SYMTAB = None):
         self.cu = cu
         self.loc: int = loc
         self.instr: bytearray = instr
@@ -23,7 +23,7 @@ class Instruction:
                 if self.symtab.table[sym].addr == val and \
                         self.symtab.table[sym].group == ADDR:
                     return f'{indirect}{immidiate}{sym}{index}'
-        return f'{indirect}{immidiate}0x{val:X}{index}' if toTA else ' '
+        return f'{indirect}{immidiate}0x{val:X}{index}' if toTA else ''
 
     def gethex(self):
         instr = ''
@@ -80,7 +80,7 @@ class Data(Instruction):
         return 'BYTE'
 
     def getDisas(self):
-        return f'{self.getSymbol(self.loc):<12}' + f'{self.getDataFormat(self.length):<8}'
+        return f'{self.getSymbol(self.loc):<11}' + f'{self.getDataFormat(self.length):<9}'
 
 
 class Word(Data):
@@ -123,7 +123,7 @@ class InstructionF1(Instruction):
         super().__init__(cu, loc, instr, symtab)
 
     def getDisas(self):
-        return f'{"":<7}' + f'{self.getSymbol(self.loc):<12}' + getMnemonicInstr(self.instr)
+        return f'{"":<6}' + ' ' f'{self.getSymbol(self.loc):<11}' + getMnemonicInstr(self.instr)
 
 
 class InstructionF2(Instruction):
@@ -133,9 +133,9 @@ class InstructionF2(Instruction):
         self.r2 = getRegister2(instr)
 
     def getDisas(self, r1=True, r2=True):
-        return f'{"":<7}' + self.form.format(self.getSymbol(self.loc), self.mnemonic,
-                                             registerToString(self.r1, r1, False),
-                                             registerToString(self.r2, r2, False))
+        return f'{"":<6}' + ' ' + self.form.format(self.getSymbol(self.loc), self.mnemonic,
+                                                   registerToString(self.r1, r1, False),
+                                                   registerToString(self.r2, r2, False))
 
 
 class InstructionF2n(InstructionF2):
@@ -238,7 +238,7 @@ def createInstruction(cu: CU, loc: int, instr: bytearray, symtab: SYMTAB = None,
     return Instruction(cu, loc, instr, symtab)
 
 
-def getInstructions(cu: CU, symtab: SYMTAB=None, rang=None, datatab=None):
+def getInstructions(cu: CU, symtab: SYMTAB = None, rang=None, datatab=None):
     instructions = []
     rang = (0, len(cu.mem) / 4) if rang is None else rang
     pc = rang[0]
@@ -249,7 +249,7 @@ def getInstructions(cu: CU, symtab: SYMTAB=None, rang=None, datatab=None):
     return instructions
 
 
-def getInstruction(pc, cu: CU, symtab: SYMTAB=None, datatab=None):
+def getInstruction(pc, cu: CU, symtab: SYMTAB = None, datatab=None):
     instr = cu.mem.get(pc, 2, asbytearr=True)
     length = getFormat(instr)
 
@@ -263,7 +263,7 @@ def getInstruction(pc, cu: CU, symtab: SYMTAB=None, datatab=None):
 
 
 class Disasembler:
-    def __init__(self, cu: CU, br: BreakPoint, symtab: SYMTAB=None, rang=None, datatab=None):
+    def __init__(self, cu: CU, br: BreakPoint, symtab: SYMTAB = None, rang=None, datatab=None):
         self.instructions = getInstructions(cu, symtab, rang, datatab)
         self.cu = cu
         self.br = br

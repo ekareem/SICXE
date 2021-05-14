@@ -101,7 +101,7 @@ class MEMORY:
             for j in range(i, i + 16, 1):
                 if j % 4 == 0: string += ' '
                 # char = chr()
-                val = chr(self.mem[j]) if 0x20 <= self.mem[j] <= 0x7f else '.'
+                val = chr(self.mem[j]) if 0x20 <= self.mem[j] <= 0x7e else '.'
                 string += val + ' '
             string += '\n'
 
