@@ -9,7 +9,7 @@ from debug.command.castcommand import DecToBase, DecToChar, DecToSignedWord, Dec
     AddrToCharPoint, AddrToWordPoint, AddrToFloatPoint
 from debug.command.command import Command
 from debug.command.disascommand import Disas
-from debug.command.nextcommand import Run, Nexti
+from debug.command.nextcommand import Run, Nexti, Step
 from debug.command.numbercommand import Number, StringToNum
 from debug.command.printcommand import PrintCommand, PrintRegisters, PrintMemory, PrintHelp
 from debug.command.registercommand import getRegisterVal, getMemoryVal
@@ -39,6 +39,11 @@ class Builder:
     def buildNexti(self, cu: CU, bp: BreakPoint, show=False, symtab=None, datatab=None):
         num = self.stack.pop() if len(self.stack) > 0 else None
         n = Nexti(cu, bp, num, show, symtab, datatab)
+        self.stack.append(n)
+
+    def buildStep(self, cu: CU, bp: BreakPoint, show=False, symtab=None, datatab=None):
+        num = self.stack.pop() if len(self.stack) > 0 else None
+        n = Step(cu, bp, num, show, symtab, datatab)
         self.stack.append(n)
 
     def buildBreak(self, bp: BreakPoint):

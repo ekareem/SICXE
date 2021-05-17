@@ -71,16 +71,16 @@ class Data(Instruction):
         return f'{form.format(self.loc, hexcode):<16}'
 
     def getDataFormat(self, length):
-        if length == 1:
+        if length == 'b':
             return 'BYTE'
-        elif length == 3:
+        elif length == 'w':
             return 'WORD'
-        elif length == 6:
+        elif length == 'f':
             return 'FLOA'
         return 'BYTE'
 
     def getDisas(self):
-        return f'{self.getSymbol(self.loc):<11}' + f'{self.getDataFormat(self.length):<9}'
+        return f'{self.getSymbol(self.loc):<15}' + f'{self.getDataFormat(self.length):<9}'
 
 
 class Word(Data):
@@ -115,7 +115,7 @@ class Byte(Data):
             else:
                 char += f'\\x{b:0<2x}'
         char += "'"
-        return super().getDisas() + f'{char:>7} '
+        return super().getDisas() + f'{char}'
 
 
 class InstructionF1(Instruction):
@@ -123,7 +123,7 @@ class InstructionF1(Instruction):
         super().__init__(cu, loc, instr, symtab)
 
     def getDisas(self):
-        return f'{"":<6}' + ' ' f'{self.getSymbol(self.loc):<11}' + getMnemonicInstr(self.instr)
+        return f'{"":<6}' + ' ' f'{self.getSymbol(self.loc):<15}' + getMnemonicInstr(self.instr)
 
 
 class InstructionF2(Instruction):
@@ -214,13 +214,13 @@ class InstructionF3m(InstructionF3):
 
 def createInstruction(cu: CU, loc: int, instr: bytearray, symtab: SYMTAB = None, datatab=None, isData=False):
     if isData:
-        if len(instr) == 3:
-            return Word(cu, loc, instr, datatab[loc], symtab)
-        if len(instr) == 1:
-            return Byte(cu, loc, instr, datatab[loc], symtab)
-        if len(instr) == 6:
-            return Floa(cu, loc, instr, datatab[loc], symtab)
-        return Byte(cu, loc, instr, datatab[loc], symtab)
+        if datatab[loc][1] == 'w':
+            return Word(cu, loc, instr, datatab[loc][1], symtab)
+        if datatab[loc][1] == 'b':
+            return Byte(cu, loc, instr, datatab[loc][1], symtab)
+        if datatab[loc][1] == 'f':
+            return Floa(cu, loc, instr, datatab[loc][1], symtab)
+        return Byte(cu, loc, instr, datatab[loc][1], symtab)
     if opcodes[getopcode(instr)]['F'] == F1:
         return InstructionF1(cu, loc, instr, symtab)
     if opcodes[getopcode(instr)]['F'] == F2r:
@@ -256,9 +256,8 @@ def getInstruction(pc, cu: CU, symtab: SYMTAB = None, datatab=None):
     isData = False
     if datatab is not None:
         if pc in datatab:
-            length = datatab[pc]
+            length = datatab[pc][0]
             isData = True
-
     return createInstruction(cu, pc, cu.mem.get(int(pc), length, asbytearr=True), symtab, datatab, isData)
 
 
@@ -274,7 +273,7 @@ class Disasembler:
         self.instructions = getInstructions(self.cu, self.symtab, rang, datatab=self.datatab)
 
     def __str__(self):
-        string = f'{" ":<2}{"ADDR":<7}\t{"HEXCODE":<15} {"OPCODE":<2}\t{"MODE":<7}{"LABEL":<11}{"MNEMON":<9}{"OPERAND":15}{"TA"}\n\n'
+        string = f'{" ":<2}{"ADDR":<7}\t{"HEXCODE":<15} {"OPCODE":<2}\t{"MODE":<7}{"LABEL":<15}{"MNEMON":<9}{"OPERAND":15}{"TA"}\n\n'
         # "{:<1}{:<6} {}{}0x{:x}{}{}{:>2}    \t{}"
         for instr in self.instructions:
             pc = self.cu.registers[SICXE_NUM_REGISTER_PC].get(False)

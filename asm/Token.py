@@ -418,7 +418,13 @@ class Res(Directive):
         length = self.line.operands[0].execute(24, False)
         addr = self.line.addr
         for i in range(addr, addr + (length * self.nbyte), self.nbyte):
-            self.line.block.section.datum[i] = self.nbyte
+
+            if self.nbyte == 3:
+                self.line.block.section.datum[i] = [self.nbyte, 'w']
+            elif self.nbyte == 6:
+                self.line.block.section.datum[i] = [self.nbyte, 'f']
+            else:
+                self.line.block.section.datum[i] = [self.nbyte, 'b']
 
         return super().getObjectCode(toInt)
 
@@ -440,7 +446,7 @@ class Byte(Directive):
         length = self.length()
         addr = self.line.addr
         # for i in range(addr, addr + length):
-        self.line.block.section.datum[addr] = length  # SICXE_SIZE_BYTE_BYTE
+        self.line.block.section.datum[addr] = [length, 'b']
 
         operands = self.line.operands
         operand = 0
@@ -463,7 +469,7 @@ class Word(Directive):
         return 3
 
     def getObjectCode(self, toInt=None):
-        self.line.block.section.datum[self.line.addr] = SICXE_SIZE_BYTE_WORD
+        self.line.block.section.datum[self.line.addr] = [SICXE_SIZE_BYTE_WORD, 'w']
         operands = self.line.operands
         if operands is None or len(operands.operands) != 1:
             raise Exception('missing operand')
@@ -483,7 +489,7 @@ class Float(Directive):
         return 6
 
     def getObjectCode(self, toInt=False):
-        self.line.block.section.datum[self.line.addr] = SICXE_SIZE_BYTE_FLOAT
+        self.line.block.section.datum[self.line.addr] = [SICXE_SIZE_BYTE_FLOAT, 'f']
         operands = self.line.operands
         if operands is None or len(operands.operands) != 1:
             raise Exception('missing operand')

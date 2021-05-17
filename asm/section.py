@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 
 from asm.storage import Symbol, CONST
 
@@ -24,7 +24,7 @@ class Section:
         self.line: Line = None
         self.currentBlock: Block = None
         self.currentLine: Line = None
-        self.datum: Dict[int, str] = {}
+        self.datum: Dict[int, List] = {}
         self.onCreate()
 
     def programLength(self):

@@ -12,7 +12,7 @@ from vm.presistance import MEMORYFILE
 
 
 class Debugger:
-    def __init__(self, cu: CU, symtab: SYMTAB = None, datatab: Dict[int, int] = None):
+    def __init__(self, cu: CU, symtab: SYMTAB = None, datatab: Dict[int, List] = None):
         self.builder = Builder()
         self.bp = BreakPoint()
         self.cu = cu
@@ -53,6 +53,10 @@ class Debugger:
                     self.builder.buildNexti(self.cu, self.bp)
                 elif token.lower() in tk.NEXTI:
                     self.builder.buildNexti(self.cu, self.bp, True, self.symtab, self.datatab)
+                elif token.lower() in tk.STEP:
+                    self.builder.buildStep(self.cu, self.bp)
+                elif token.lower() in tk.STEPI:
+                    self.builder.buildStep(self.cu, self.bp, True, self.symtab, self.datatab)
                 elif token.lower() in tk.BREAK:
                     self.builder.buildBreak(self.bp)
                 elif token.lower() in tk.BREAK:

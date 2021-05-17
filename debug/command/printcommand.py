@@ -91,6 +91,18 @@ COMMANDS = nexti, ni
 OPTIONAL FLAG -- <number>, how many instructions to run
 EX: nexti
 EX: nexti 5
+""", }, {'STEP': """
+STEP -- Runs next command and steps over subroutines
+COMMANDS = step, st
+OPTIONAL FLAG -- <number>, how many instructions to run
+EX: step
+EX: step 5
+
+STEPI -- Runs and prints next command and steps over subroutines
+COMMANDS = stepi, sti
+OPTIONAL FLAG -- <number>, how many instructions to run
+EX: stepi
+EX: stepi 5
 """, },
     {'BREAK': """
 BREAK -- Sets a break point at a memory location 
@@ -274,11 +286,13 @@ class PrintHelp(Command):
         string = ''
         if self.command is None:
             string = """
+
 type help get these commands 
 
 #type help all to see all commands 
 RUN -- Runs all instructions until break point is hit
 NEXT -- Runs next command 
+STEP -- Runs next command and step over subroutine
 BREAK -- Sets a break point at a memory location 
 DISAS -- Converts machine code to low level symbolic language 
 PRINT -- Print the value of given command 
@@ -291,17 +305,12 @@ READ -- Retrieves memory from memory file
 LOAD -- loads object program to memory
 EXIT -- exits program
 
-a = 0
-x = 1
-l = 2
-b = 3
-s = 4
-t = 5
-f = 6
-p = 8
-pc = 8
-w = 9
-sw = 9
+
+a : 0, x : 1, l : 2, b : 3, s : 4, t : 5, f : 6, p : 8, pc : 8, w : 9, sw : 9
+the letter above correspond to numbers
+(a) returns register A value
+(b) return register B value
+parenthesis with register letter inside of it returns register value
 """
         if self.command == "ALL":
             for h in helps:
