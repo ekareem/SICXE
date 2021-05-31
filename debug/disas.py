@@ -4,7 +4,7 @@ from util import getFormat, getMnemonicInstr, getopcode, opcodes, F1, getRegiste
     getRegister2, strformat, F2n, F2rn, F2rr, F2r, flagmap, EXTENDED, isExtendedInstr, F3, IMMIDIATE, isImidiateInstr, \
     INDIRECT, isIndirectInstr, isIndexedInstr, isBaseInstr, isPcInstr, INDEX, BASE, PC, getDisp, F3m, \
     nixbpeToStringInstr, getTargetAddress, INT, isDirectInstr, isSicInstr, bytearrayToInt, bytearrayToFloat, \
-    SICXE_SIZE_BIT_EXPONENT, SICXE_SIZE_BIT_MANTISSA
+    SICXE_SIZE_BIT_EXPONENT, SICXE_SIZE_BIT_MANTISSA,decToInt
 from vm import CU, SICXE_NUM_REGISTER_PC, register
 
 
@@ -189,19 +189,26 @@ class InstructionF3m(InstructionF3):
         index = flagmap[INDEX] if isIndexedInstr(self.instr) else ''
         base = flagmap[BASE] if isBaseInstr(self.instr) else ''
         pc = flagmap[PC] if isPcInstr(self.instr) else ''
-        operand = getDisp(self.instr)
+        operand = self.signedDisp() #getDisp(self.instr)
+        sign = '-' if operand < 0 else ''
         nixpbe = nixbpeToStringInstr(self.instr)
         p = INT(self.loc + len(self.instr), 24, False)
         ta = getTargetAddress(self.instr, p, register.B, register.X, self.cu.mem, isDisas=True)
         out = nixpbe + ' ' + self.form.format(self.getSymbol(self.loc, toTA=False), extended, self.mnemonic,
                                               self.getSymbol(ta.dec, inDirect, immidiate, index, toTA=True), immidiate,
                                               inDirect,
-                                              operand,
+                                              sign,
+                                              abs(operand),
                                               pc, base, index)
 
         f = ' ' * (60 - len(out))
         return out + f + ' = ' + self.ta(ta)
 
+    def signedDisp(self):
+        if isExtendedInstr(self.instr):
+            return decToInt(getDisp(self.instr),20,signed=True)
+        return  decToInt(getDisp(self.instr),12,signed=True)
+    
     def ta(self, ta):
         mode = ['', '']
         if isDirectInstr(self.instr) or isSicInstr(self.instr):

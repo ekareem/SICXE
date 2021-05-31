@@ -106,7 +106,6 @@ def infixToPostfixx(infixexpr):
 
     while not len(opStack) == 0:
         postfixList.append(opStack.pop())
-    print(postfixList)
     return postfixList
 
 
