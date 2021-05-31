@@ -17,17 +17,17 @@ registerToInt = {
 }
 
 stringToReg = {
-    '(a)': SICXE_NUM_REGISTER_A,
-    '(x)': SICXE_NUM_REGISTER_X,
-    '(l)': SICXE_NUM_REGISTER_L,
-    '(b)': SICXE_NUM_REGISTER_B,
-    '(s)': SICXE_NUM_REGISTER_S,
-    '(t)': SICXE_NUM_REGISTER_T,
-    '(f)': SICXE_NUM_REGISTER_F,
-    '(pc)': SICXE_NUM_REGISTER_PC,
-    '(p)': SICXE_NUM_REGISTER_PC,
-    '(w)': SICXE_NUM_REGISTER_SW,
-    '(sw)': SICXE_NUM_REGISTER_SW,
+    '[a]': SICXE_NUM_REGISTER_A,
+    '[x]': SICXE_NUM_REGISTER_X,
+    '[l]': SICXE_NUM_REGISTER_L,
+    '[b]': SICXE_NUM_REGISTER_B,
+    '[s]': SICXE_NUM_REGISTER_S,
+    '[t]': SICXE_NUM_REGISTER_T,
+    '[f]': SICXE_NUM_REGISTER_F,
+    '[pc]': SICXE_NUM_REGISTER_PC,
+    '[p]': SICXE_NUM_REGISTER_PC,
+    '[w]': SICXE_NUM_REGISTER_SW,
+    '[sw]': SICXE_NUM_REGISTER_SW,
 }
 
 

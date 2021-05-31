@@ -35,7 +35,7 @@ class SetRegister(Set):
         dec = ''
         if issubclass(type(rm), NUM):
             if int(rm.nbits / SICXE_SIZE_BIT_BYTE) != len(val):
-                raise Exception('invalid value')
+                raise Exception('invalid value type')
             dec = bytearrayToInt(val, False)
             rm.set(dec, False)
             return dec

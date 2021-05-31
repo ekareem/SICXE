@@ -88,9 +88,10 @@ class Word(Data):
         super().__init__(cu, loc, instr, length, symtab)
 
     def getDisas(self):
+        #f'{hex(bytearrayToInt(self.instr, False)):<15}'
         return super(Word,
-                     self).getDisas() + f'{hex(bytearrayToInt(self.instr, False)):<15}' \
-               + f'{bytearrayToInt(self.instr, False):<1}' + ' | ' \
+                     self).getDisas()  + f'0x{bytearrayToInt(self.instr, False):0>6X}' \
+               +f'{"":<7}'+ f'{bytearrayToInt(self.instr, False):<1}' + ' | ' \
                + f'{bytearrayToInt(self.instr, True):<2} '
 
 
@@ -283,8 +284,7 @@ class Disasembler:
 
 def isExpression(token):
     for c in token:
-        if not (
-                c == '+' or c == '-' or c == '*' or c == '/' or c == '%' or c == '(' or c == ')' or c == '.' or c.isalnum()):
+        if not (c == '+' or c == '-' or c == '*' or c == '/' or c == '%' or c == '(' or c == ')' or  c == '[' or c == ']' or c == '.' or c.isalnum()):
             return False
     index = max(token.find('+'), token.find('-'), token.find('*'), token.find('/'), token.find('%'))
     return index != -1 and index != 0

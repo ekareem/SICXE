@@ -139,15 +139,17 @@ REGISTERVALUES -- Returns all values of given register
 COMMANDS = registers, rgs
 EX: registers 
 
-(a) = value of register a
-(x) = value of register x
-(l) = value of register l
-(p) = value of register p
-(w) = value of register w
-(b) = value of register b
-(s) = value of register s
-(t) = value of register t
-(f) = value of register f
+[a] = value of register a
+[x] = value of register x
+[l] = value of register l
+[p] = value of register pc
+[pc] = value of register pc
+[w] = value of register sw
+[sw] = value of register sw
+[b] = value of register b
+[s] = value of register s
+[t] = value of register t
+[f] = value of register f
 """, },
     {'MEMORY': """
 MEMORY -- Gets memory value
@@ -308,9 +310,17 @@ EXIT -- exits program
 
 a : 0, x : 1, l : 2, b : 3, s : 4, t : 5, f : 6, p : 8, pc : 8, w : 9, sw : 9
 the letter above correspond to numbers
-(a) returns register A value
-(b) return register B value
-parenthesis with register letter inside of it returns register value
+[a] = value of register a
+[x] = value of register x
+[l] = value of register l
+[p] = value of register pc
+[pc] = value of register pc
+[w] = value of register sw
+[sw] = value of register sw
+[b] = value of register b
+[s] = value of register s
+[t] = value of register t
+[f] = value of register f
 """
         if self.command == "ALL":
             for h in helps:

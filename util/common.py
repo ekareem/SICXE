@@ -73,7 +73,8 @@ def isFloat(num: str):
         return True
     except:
         return False
-
+        
+regs = ['[a]','[x]','[l]','[b]','[s]','[t]','[f]','[pc]','[p]','[w]','[sw]']
 
 def infixToPostfixx(infixexpr):
     prec = {}
@@ -88,7 +89,7 @@ def infixToPostfixx(infixexpr):
     tokenList = tokenizeExpr(infixexpr)
 
     for token in tokenList:
-        if token.isalnum() or isFloat(token):
+        if token.isalnum() or isFloat(token) or token.lower() in regs:
             postfixList.append(token)
         elif token == '(':
             opStack.append(token)
@@ -105,6 +106,7 @@ def infixToPostfixx(infixexpr):
 
     while not len(opStack) == 0:
         postfixList.append(opStack.pop())
+    print(postfixList)
     return postfixList
 
 
