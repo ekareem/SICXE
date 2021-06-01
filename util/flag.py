@@ -16,8 +16,8 @@ flagmap = {
     INDIRECT: '@',
     IMMIDIATE: '#',
     INDEX: ',X',
-    BASE: '+(B)',
-    PC: '+(PC)',
+    BASE: '+[B]',
+    PC: '+[PC]',
     EXTENDED: '+',
 }
 
@@ -155,7 +155,7 @@ def isPcInstr(instr: bytearray):
 
 
 def registerToString(num: int, asStr=True, paran=True):
-    r = ["(A)", "(X)", "(L)", "(B)", "(S)", "(T)", "(F)", "(?)", "(P)", "(SW)"] \
+    r = ["[A]", "[X]", "[L]", "[B]", "[S]", "[T]", "[F]", "[?]", "[PC]", "[SW]"] \
         if paran else ["A", "X", "L", "B", "S", "T", "F", "?", "P", "SW"]
     if num in [0, 1, 2, 3, 4, 5, 6, 8, 9] and asStr:
         return r[num]

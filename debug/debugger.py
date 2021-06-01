@@ -90,7 +90,7 @@ class Debugger:
                 elif token.lower() in tk.TOFLOAT:
                     self.builder.buildDecToFloat()
                 elif token.lower() in tk.TOINSTRUCTION:
-                    self.builder.buildToInstr(self.cu, self.symtab, self.datatab)
+                    self.builder.buildToInstr(self.cu, self.symtab, self.datatab,self.dis.br)
                 elif token.lower() in tk.SET:
                     self.builder.buildSet()
                 elif token.lower() in tk.SETCC:

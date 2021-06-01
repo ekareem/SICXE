@@ -19,7 +19,7 @@ class PrintCommand(UnaryCommand):
         count = 0
         for line in lines:
             print(line)
-            if count > 30:
+            if count > 50:
                 n = input('continue y or n')
                 if n.lower() in ['n', 'no']:
                     break

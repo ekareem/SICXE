@@ -79,6 +79,8 @@ def run(file: str, isAsm=False, memfile=None, loadFile=None):
         if memfile is not None:
             memoryWrite(b.cu, memfile)
     except BaseException as e:
+        if memfile is not None:
+            memoryWrite(b.cu, memfile)
         print(e)
 
 

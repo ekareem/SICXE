@@ -5,7 +5,7 @@ from debug.command.command import Command, UnaryCommand, BinaryCommand
 from debug.disas import getInstruction
 from util import SICXE_SIZE_BIT_WORD, intToDec, decToInt, intToBytearray, SICXE_SIZE_BIT_MANTISSA, \
     SICXE_SIZE_BIT_EXPONENT, decToFloat
-from vm import CU
+from vm import CU, SICXE_NUM_REGISTER_PC
 
 
 class DecTo(UnaryCommand):
@@ -79,14 +79,18 @@ class DecToFloat(DecTo):
 
 
 class DecToInstr(DecTo):
-    def __init__(self, cu: CU, child: Command = None, symtab=None, datatab=None):
+    def __init__(self, cu: CU, child: Command = None, symtab=None, datatab=None,br=[]):
         super().__init__(child)
         self.cu = cu
         self.symtab = symtab
         self.datatab = datatab
+        self.br = br
 
     def cast(self, num: float):
-        return str(getInstruction(num, self.cu, self.symtab, self.datatab))
+        pc = self.cu.registers[SICXE_NUM_REGISTER_PC].get(False)
+        instr = getInstruction(num, self.cu, self.symtab, self.datatab,isDat=False)
+        return f"{'>' if pc == instr.loc else '*' if instr.loc in self.br else ' '} {instr}"
+        #return string'  ' + str(getInstruction(num, self.cu, self.symtab, self.datatab))
 
 
 class AddrToCharPoint(DecTo):

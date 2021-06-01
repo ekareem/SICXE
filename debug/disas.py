@@ -80,7 +80,7 @@ class Data(Instruction):
         return 'BYTE'
 
     def getDisas(self):
-        return f'{self.getSymbol(self.loc):<15}' + f'{self.getDataFormat(self.length):<9}'
+        return f'{self.getSymbol(self.loc):<16}' + f'{self.getDataFormat(self.length):<9}'
 
 
 class Word(Data):
@@ -114,7 +114,7 @@ class Byte(Data):
             if 0x20 <= b <= 0x7e:
                 char += chr(b)
             else:
-                char += f'\\x{b:0<2x}'
+                char += f'\\x{b:0>2x}'
         char += "'"
         return super().getDisas() + f'{char}'
 
@@ -124,7 +124,7 @@ class InstructionF1(Instruction):
         super().__init__(cu, loc, instr, symtab)
 
     def getDisas(self):
-        return f'{"":<6}' + ' ' f'{self.getSymbol(self.loc):<15}' + getMnemonicInstr(self.instr)
+        return f'{"":<6}' + ' ' + self.form.format(self.getSymbol(self.loc),getMnemonicInstr(self.instr)) #f'{self.getSymbol(self.loc):<15}' + getMnemonicInstr(self.instr)
 
 
 class InstructionF2(Instruction):
@@ -173,7 +173,7 @@ class InstructionF3(Instruction):
         super().__init__(cu, loc, instr, symtab)
 
     def getDisas(self):
-        extended = flagmap[EXTENDED] if isExtendedInstr(self.instr) else ''
+        extended = flagmap[EXTENDED] if isExtendedInstr(self.instr) else ' '
         nixpbe = nixbpeToStringInstr(self.instr)
         return nixpbe + ' ' + self.form.format(self.getSymbol(self.loc), extended, self.mnemonic)
 
@@ -183,7 +183,7 @@ class InstructionF3m(InstructionF3):
         super().__init__(cu, loc, instr, symtab)
 
     def getDisas(self):
-        extended = flagmap[EXTENDED] if isExtendedInstr(self.instr) else ''
+        extended = flagmap[EXTENDED] if isExtendedInstr(self.instr) else ' '
         immidiate = flagmap[IMMIDIATE] if isImidiateInstr(self.instr) else ''
         inDirect = flagmap[INDIRECT] if isIndirectInstr(self.instr) else ''
         index = flagmap[INDEX] if isIndexedInstr(self.instr) else ''
@@ -201,7 +201,7 @@ class InstructionF3m(InstructionF3):
                                               abs(operand),
                                               pc, base, index)
 
-        f = ' ' * (60 - len(out))
+        f = ' ' * (70 - len(out))
         return out + f + ' = ' + self.ta(ta)
 
     def signedDisp(self):
@@ -257,13 +257,13 @@ def getInstructions(cu: CU, symtab: SYMTAB = None, rang=None, datatab=None):
     return instructions
 
 
-def getInstruction(pc, cu: CU, symtab: SYMTAB = None, datatab=None):
+def getInstruction(pc, cu: CU, symtab: SYMTAB = None, datatab=None,isDat = True):
     instr = cu.mem.get(pc, 2, asbytearr=True)
     length = getFormat(instr)
 
     isData = False
-    if datatab is not None:
-        if pc in datatab:
+    if datatab is not None :
+        if pc in datatab and isDat:
             length = datatab[pc][0]
             isData = True
     return createInstruction(cu, pc, cu.mem.get(int(pc), length, asbytearr=True), symtab, datatab, isData)
@@ -281,7 +281,7 @@ class Disasembler:
         self.instructions = getInstructions(self.cu, self.symtab, rang, datatab=self.datatab)
 
     def __str__(self):
-        string = f'{" ":<2}{"ADDR":<7}\t{"HEXCODE":<15} {"OPCODE":<2}\t{"MODE":<7}{"LABEL":<15}{"MNEMON":<9}{"OPERAND":15}{"TA"}\n\n'
+        string = f'{" ":<2}{"ADDR":<7}\t{"HEXCODE":<15} {"OPCODE":<2}\t{"MODE":<7}{"LABEL":<16}{"MNEMON":<9}{"OPERAND":15}{"TA"}\n\n'
         # "{:<1}{:<6} {}{}0x{:x}{}{}{:>2}    \t{}"
         for instr in self.instructions:
             pc = self.cu.registers[SICXE_NUM_REGISTER_PC].get(False)
@@ -291,7 +291,7 @@ class Disasembler:
 
 def isExpression(token):
     for c in token:
-        if not (c == '+' or c == '-' or c == '*' or c == '/' or c == '%' or c == '(' or c == ')' or  c == '[' or c == ']' or c == '.' or c.isalnum()):
+        if not (c == '+' or c == '-' or c == '*' or c == '/' or c == '%' or c == '(' or c == ')' or  c == '[' or c == ']' or c == '.'  or c == '$' or c.isalnum()):
             return False
     index = max(token.find('+'), token.find('-'), token.find('*'), token.find('/'), token.find('%'))
     return index != -1 and index != 0

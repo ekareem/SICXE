@@ -1,4 +1,5 @@
 from typing import Tuple
+from random import randint
 
 from util.size import *
 from util.num import *
@@ -8,6 +9,8 @@ from util.common import *
 class MEMORY:
     def __init__(self, size):
         self.mem = bytearray(size)
+        for i in range(len(self.mem)):
+            self.mem[i] = randint(0x00,0xFF)
 
     def __getitem__(self, addr):
         return self.getbyte(addr)

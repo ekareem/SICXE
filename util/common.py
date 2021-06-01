@@ -87,9 +87,9 @@ def infixToPostfixx(infixexpr):
     opStack = []
     postfixList = []
     tokenList = tokenizeExpr(infixexpr)
-
+    
     for token in tokenList:
-        if token.isalnum() or isFloat(token) or token.lower() in regs:
+        if token.isalnum() or isFloat(token) or token.lower() in regs or token.find('$') != -1:
             postfixList.append(token)
         elif token == '(':
             opStack.append(token)
@@ -106,6 +106,7 @@ def infixToPostfixx(infixexpr):
 
     while not len(opStack) == 0:
         postfixList.append(opStack.pop())
+    
     return postfixList
 
 
