@@ -412,7 +412,7 @@ class FLOAT(NUM):
         return self.getbits((0, self.mantissaLen), LITTLE)
 
     def normalize(self, toCLS=True, setSelf=False):
-        val = normalize(self.exponentLen, self.mantissaLen)
+        val = normalize(self.dec, self.exponentLen, self.mantissaLen)
         return self.output(val, toCLS, setSelf)
 
     def output(self, val: float, toCLS=True, setSelf=False, signed=None):

@@ -59,7 +59,7 @@ def debug(file: str, isAsm=False, memoryFile=None):
                 c = d.evaluate(n)
                 c.execute()
         except BaseException as e:
-           print(e)
+          print(e)
 
 
 def run(file: str, isAsm=False, memfile=None, loadFile=None):
@@ -201,3 +201,5 @@ if __name__ == '__main__':
             mem = args[i] if len(args) > i else MEMORYFILE
 
         run(file, asAsm, mem)
+    else:
+        help(None)

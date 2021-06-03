@@ -175,6 +175,10 @@ class CU:
                    self.mem,
                    self.fetch(),
                    isImidiateInstr(self.instruction))
+    
+    def divr(self):
+        alu.divrr(reg.getRegister(getRegister1(self.instruction)),
+                  reg.getRegister(getRegister2(self.instruction)))
 
     def fix(self):
         reg.getRegister(reg.SICXE_NUM_REGISTER_A).set(reg.getRegister(reg.SICXE_NUM_REGISTER_F))

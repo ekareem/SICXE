@@ -24,7 +24,7 @@ class Nexti(UnaryCommand):
         for i in range(num):
             i = self.cu.getInstruction()
             if self.show:
-                print(createInstruction(self.cu, int(pc), i, self.symtab, self.datatab))
+                print('  '+str(createInstruction(self.cu, int(pc), i, self.symtab, self.datatab)))
             pc = self.cu.registers[SICXE_NUM_REGISTER_PC].get(False)
             self.bp.remove(pc)
             # self.cu.ontick()
@@ -62,9 +62,12 @@ class Step(UnaryCommand):
 
         pc = self.cu.registers[SICXE_NUM_REGISTER_PC].get(False)
         if self.show:
-            print(createInstruction(self.cu, int(pc), instr, self.symtab, self.datatab))
+            print('  '+str(createInstruction(self.cu, int(pc), instr, self.symtab, self.datatab)))
         self.bp.remove(pc)
-        self.cu.run()
+        try:
+            self.cu.run()
+        except BaseException as e:
+            print(e)
 
         if inSub:
             self.step(inSub)
@@ -82,15 +85,16 @@ class Run(UnaryCommand):
     def execute(self, inputs=None):
         ms = self.child.execute() if self.child is not None else 0
         pc = self.cu.registers[SICXE_NUM_REGISTER_PC]
-        # count = int(SICXE_SIZE_MEMORY/3)
 
         while pc.get() not in self.bp and not self.cu.halted:
-            i = self.cu.getInstruction()
-            if self.show:
-                print(createInstruction(self.cu, int(pc), i, self.symtab, self.datatab))
-            self.cu.run(ms)
-            # self.cu.ontick()
-            # self.cu.execute()
+            try:
+                i = self.cu.getInstruction()
+                if self.show:
+                    print('  '+str(createInstruction(self.cu, int(pc), i, self.symtab, self.datatab)))
+                self.cu.run(ms)
+            except BaseException as e:
+                print(e)
+
         self.cu.halted = False
         self.bp.remove(pc.get())
 

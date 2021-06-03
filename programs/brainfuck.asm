@@ -4,10 +4,10 @@ loop        TD      idev            .check if device is ready
             JEQ     loop
 
             JSUB    stackinit       .initialise stack state
+            JSUB    cleartape       .clear tape state
             JSUB    readinstr       .load program string from stdin
             JSUB    stackinit       .reset stack pointer to starting position
             JSUB    execute         .execute loaded program
-            JSUB    cleartape       .clear tape state
             J       loop            .when program finishes, wait for next one
 
 halt        J       halt
