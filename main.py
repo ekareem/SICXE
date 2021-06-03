@@ -59,7 +59,7 @@ def debug(file: str, isAsm=False, memoryFile=None):
                 c = d.evaluate(n)
                 c.execute()
         except BaseException as e:
-          print(e)
+            print(e)
 
 
 def run(file: str, isAsm=False, memfile=None, loadFile=None):
@@ -121,7 +121,6 @@ def commandDebug(args: List[str]):
     asAsm = False
     script = None
     memoryFile = None
-
     for i, arg in enumerate(args):
         if arg.strip().lower() in ('-o', '-obj', '-a', '-asm'):
             if script is not None:
@@ -137,7 +136,7 @@ def commandDebug(args: List[str]):
             if len(args) < i + 2:
                 raise Exception(f"{arg} requires an memory file")
             memoryFile = args[i + 1]
-
+        
     debug(script, asAsm, memoryFile)
 
 
@@ -157,6 +156,7 @@ def commandRun(args: List[str]):
     script = None
     loadFile = None
     memoryFile = None
+    crun = False
 
     for i, arg in enumerate(args):
         if arg.strip().lower() in ('-o', '-obj', '-a', '-asm'):
@@ -169,6 +169,7 @@ def commandRun(args: List[str]):
             elif arg.strip().lower() in ('-o', '-obj'):
                 asAsm = False
             script = args[i + 1]
+            crun = True
         if arg.strip().lower() in ('-w', '-write'):
             if len(args) < i + 2:
                 raise Exception(f"{arg} requires an memory file try memory.txt")
@@ -177,29 +178,35 @@ def commandRun(args: List[str]):
             if len(args) < i + 2:
                 raise Exception(f"{arg} requires an memory file")
             loadFile = args[i + 1]
-
-    run(script, asAsm, memoryFile, loadFile)
+            crun = True
+    if crun:
+        run(script, asAsm, memoryFile, loadFile)
+    else:
+        help('-run')
 
 
 if __name__ == '__main__':
-    args = sys.argv
-    if len(args) < 2 or args[1] in ('-h', '-help', 'help', 'h'):
-        help(None if len(args) < 3 else args[2] if args[2] in (
-            '-b', 'b', '-bug', 'bug', 'run', 'r', '-run', '-r', 'asm', 'a', '-asm', '-a', 'run', 'r', '-run',
-            '-r') else None)
-    elif args[1] in ('-asm', '-a', 'asm', '-a'):
-        commandAsm(args[2:])
-    elif args[1] in ('-b', '-bug', 'b', 'bug'):
-        commandDebug(args[2:])
-    elif args[1] in ('-r', '-run', 'r', 'run'):
-        asAsm = False if args[2] in ('-o', '-obj') else True if args[2] in ('-a', '-asm') else None
-        file = args[3]
-        i = 4
-        mem = None
-        if len(args) > i and args[i] == '-w':
-            i += 1
-            mem = args[i] if len(args) > i else MEMORYFILE
+    try:
+        args = sys.argv
+        if len(args) < 2 or args[1] in ('-h', '-help', 'help', 'h'):
+            help(None if len(args) < 3 else args[2] if args[2] in (
+                '-b', 'b', '-bug', 'bug', 'run', 'r', '-run', '-r', 'asm', 'a', '-asm', '-a', 'run', 'r', '-run',
+                '-r') else None)
+        elif args[1] in ('-asm', '-a', 'asm', '-a'):
+            commandAsm(args[2:])
+        elif args[1] in ('-b', '-bug', 'b', 'bug'):
+            commandDebug(args[2:])
+        elif args[1] in ('-r', '-run', 'r', 'run'):
+            asAsm = False if args[2] in ('-o', '-obj') else True if args[2] in ('-a', '-asm') else None
+            file = args[3]
+            i = 4
+            mem = None
+            if len(args) > i and args[i] == '-w':
+                i += 1
+                mem = args[i] if len(args) > i else MEMORYFILE
 
-        run(file, asAsm, mem)
-    else:
+            run(file, asAsm, mem)
+        else:
+            help(None)
+    except:
         help(None)

@@ -4,8 +4,8 @@ from typing import List
 from debug.disas import createInstruction
 from debug.breakpoint import BreakPoint
 from debug.command.command import Command, UnaryCommand
-from util import SICXE_SIZE_MEMORY, JSUB, getopcode, RSUB
-from vm import CU, SICXE_NUM_REGISTER_PC
+from util import SICXE_SIZE_MEMORY, JSUB, getopcode, RSUB, getFormat
+from vm import CU, SICXE_NUM_REGISTER_PC, SICXE_NUM_REGISTER_L
 
 
 class Nexti(UnaryCommand):
@@ -22,14 +22,15 @@ class Nexti(UnaryCommand):
 
         pc = self.cu.registers[SICXE_NUM_REGISTER_PC].get(False)
         for i in range(num):
-            i = self.cu.getInstruction()
-            if self.show:
-                print('  '+str(createInstruction(self.cu, int(pc), i, self.symtab, self.datatab)))
-            pc = self.cu.registers[SICXE_NUM_REGISTER_PC].get(False)
-            self.bp.remove(pc)
-            # self.cu.ontick()
-            # self.cu.execute()
-            self.cu.run()
+            try:
+                i = self.cu.getInstruction()
+                if self.show:
+                    print('  ' + str(createInstruction(self.cu, int(pc), i, self.symtab, self.datatab)))
+                pc = self.cu.registers[SICXE_NUM_REGISTER_PC].get(False)
+                self.bp.remove(pc)
+                self.cu.run()
+            except BaseException as e:
+                print(e)
 
         return None
 
@@ -51,26 +52,29 @@ class Step(UnaryCommand):
 
         return None
 
-    def step(self, inSub=False):
-        instr = self.cu.getInstruction()
+    def step(self):
+        inSub = False
+        First = True
+        retaddr = 0
+        while First or inSub:
+            instr = self.cu.getInstruction()
 
-        if getopcode(instr) == JSUB:
-            inSub = True
+            if getopcode(instr) == JSUB and First:
+                inSub = True
+                retaddr = self.cu.registers[SICXE_NUM_REGISTER_PC].get(False) + getFormat(self.cu.getInstruction())
 
-        if getopcode(instr) == RSUB:
-            inSub = False
+            if getopcode(instr) == RSUB and self.cu.registers[SICXE_NUM_REGISTER_L].get(False) == retaddr:
+                inSub = False
 
-        pc = self.cu.registers[SICXE_NUM_REGISTER_PC].get(False)
-        if self.show:
-            print('  '+str(createInstruction(self.cu, int(pc), instr, self.symtab, self.datatab)))
-        self.bp.remove(pc)
-        try:
-            self.cu.run()
-        except BaseException as e:
-            print(e)
-
-        if inSub:
-            self.step(inSub)
+            pc = self.cu.registers[SICXE_NUM_REGISTER_PC].get(False)
+            if self.show:
+                print('  ' + str(createInstruction(self.cu, int(pc), instr, self.symtab, self.datatab)))
+            self.bp.remove(pc)
+            try:
+                self.cu.run()
+            except BaseException as e:
+                print(e)
+            First = False
 
 
 class Run(UnaryCommand):
@@ -90,7 +94,7 @@ class Run(UnaryCommand):
             try:
                 i = self.cu.getInstruction()
                 if self.show:
-                    print('  '+str(createInstruction(self.cu, int(pc), i, self.symtab, self.datatab)))
+                    print('  ' + str(createInstruction(self.cu, int(pc), i, self.symtab, self.datatab)))
                 self.cu.run(ms)
             except BaseException as e:
                 print(e)

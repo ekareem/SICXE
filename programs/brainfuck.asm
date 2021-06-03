@@ -19,7 +19,7 @@ execute     STL     retaddr         .save return address
 
 execloop    CLEAR   A               .load instruction
             LDCH    @stackptr       .if 0x00 finish execution
-            COMP    =0
+            COMP    #0x00
             JEQ     endexec
 
             COMP    cinc            .otherwise, check for appropriate command
@@ -49,14 +49,14 @@ execloop    CLEAR   A               .load instruction
 continue    JSUB    stackpush       .go to next instruction
             J       execloop
 
-endexec     LDCH    =X'0A'
+endexec     LDCH    #0x0A
             WD      odev
             LDL     retaddr         .restore return address, finish program execution
             RSUB
 
 .***** BRAINFUCK PROGRAM COMMAND EXECUTION *****
 loops       LDCH    @tapeptr        .handle command for loop start, load current cell
-            COMP    =0
+            COMP    #0x00
             JGT     endls
             LDX     #1
             RMO     X,S
@@ -78,7 +78,7 @@ endls       JSUB    clr
             J       continue
 
 loope       LDCH    @tapeptr    .handle command for loop end, load current cell
-            COMP    =0
+            COMP    #0x00
             JEQ     endle       .check if cell is empty
             LDX     #1          .set initial loop counter state
             RMO     X,S
@@ -116,8 +116,8 @@ incr        LDCH   @tapeptr     .increment cell value
             J       continue
 
 decr        LDCH    @tapeptr    .decrement cell value
-            COMP    =0          .cannot go lower than 0
-            JEQ     enddecr
+            .COMP    =0          .cannot go lower than 0
+            .JEQ     enddecr
             SUB     #1
             STCH    @tapeptr
 enddecr     J       continue
@@ -141,7 +141,7 @@ clr         CLEAR   A           .clear register state
 readinstr   STL     retaddr
 readloop    CLEAR   A
             RD      idev        .while not end of line, read commands from input
-            COMP    =X'00000A'  .check for EOT character
+            COMP    #0x0A  .check for EOT character
             JEQ     finish
             STCH    @stackptr   .save each command to stack
             JSUB    stackpush
@@ -159,13 +159,14 @@ cleartape   STL     retaddr
             LDA     #tape1
             STA     tapeptr
 
-loopclear   STCH    @tapeptr    .set memory cell to 0x00
+loopclear   CLEAR   A
+            STCH    @tapeptr    .set memory cell to 0x00
             LDA     tapeptr     .load current tape pointer and increment
             ADD     #1
-            COMPR	X,A         .if end of tape, finish clearing
+            COMPR   X,A         .if end of tape, finish clearing
             JEQ     cleared
             STA     tapeptr
-            CLEAR   A
+
             J       loopclear
 
 cleared     JSUB    clr
@@ -217,3 +218,5 @@ tape2       RESB    200         .limited to 400B, increase at own peril
 tapeend     EQU     *
 
 retaddr     RESW    1           .temporary link register variable
+            
+            END     loop

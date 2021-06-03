@@ -107,8 +107,10 @@ def ld(register: INT, mem: MEMORY, addr, isImmediate=False):
 
 
 def ldf(register: FLOAT, mem: MEMORY, addr, isImmediate=False):
-    operand = addr if isImmediate else mem.getfloat(addr)
-    register.set(operand)
+    if isImmediate:
+        register.set(addr)
+    else:
+        register.dec = mem.get(addr, 6)
 
 
 def ldch(register: INT, mem: MEMORY, addr, isImmediate=False):
@@ -123,22 +125,8 @@ def st(register: INT, mem: MEMORY, addr):
 
 
 def stf(register: FLOAT, mem: MEMORY, addr):
-    mem.setfloat(addr, register)
+    mem.set(addr, register.dec, 6)
 
 
 def stch(register: INT, mem: MEMORY, addr):
     mem.setbyte(addr, register.getbits((0, 8), False, LITTLE))
-
-
-if __name__ == '__main__':
-    r = MEMORY(0x20)
-    r.set(0x3, 21, 3)
-    r.setfloat(0x8, 1.4)
-    r.print((0, 0x20))
-    a = A
-    sw = SW
-    f = F
-    f.set(-2.5, True)
-    print(f)
-    mulfrm(F, r, 0x8)
-    print(F)
