@@ -37,11 +37,13 @@ class CU:
         if opcode == DIVR: return self.divr
         if opcode == FIX: return self.fix
         if opcode == FLOA: return self.float
+        if opcode == HALT: return self.halt
         if opcode == HIO: return self.hio
         if opcode == J: return self.j
         if opcode == JEQ: return self.jeq
         if opcode == JGT: return self.jgt
         if opcode == JLT: return self.jlt
+        if opcode == JNE: return self.jne
         if opcode == JSUB: return self.jsub
         if opcode == LDA: return self.lda
         if opcode == LDB: return self.ldb
@@ -81,7 +83,6 @@ class CU:
         if opcode == TIX: return self.tix
         if opcode == TIXR: return self.tixr
         if opcode == WD: return self.wd
-        if opcode == HALT: return self.halt
         return self.xxx
 
     def ontick(self):
@@ -206,6 +207,10 @@ class CU:
     def jlt(self):
         cc = reg.getRegister(reg.SICXE_NUM_REGISTER_SW).getbits((6, 8), BIG)
         if cc == alu.SICXE_CC_LT: self.j()
+
+    def jne(self):
+        cc = reg.getRegister(reg.SICXE_NUM_REGISTER_SW).getbits((6, 8), BIG)
+        if cc != alu.SICXE_CC_EQ: self.j()
 
     def jsub(self):
         reg.getRegister(reg.SICXE_NUM_REGISTER_L).set(reg.getRegister(reg.SICXE_NUM_REGISTER_PC))

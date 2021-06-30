@@ -15,11 +15,13 @@ OPCODE = {
     'DIVR': {'mnemonic': 'DIVR', 'format': 2, 'opcode': 0x9c},
     'FIX': {'mnemonic': 'FIX', 'format': 1, 'opcode': 0xc4},
     'FLOAT': {'mnemonic': 'FLOAT', 'format': 1, 'opcode': 0xc0},
+    'HALT': {'mnemonic': 'HALT', 'format': 1, 'opcode': 0xe4},
     'HIO': {'mnemonic': 'HIO', 'format': 1, 'opcode': 0xf4},
     'J': {'mnemonic': 'J', 'format': 3, 'opcode': 0x3c},
     'JEQ': {'mnemonic': 'JEQ', 'format': 3, 'opcode': 0x30},
     'JGT': {'mnemonic': 'JGT', 'format': 3, 'opcode': 0x34},
     'JLT': {'mnemonic': 'JLT', 'format': 3, 'opcode': 0x38},
+    'JNE': {'mnemonic': 'JNE', 'format': 3, 'opcode': 0x8c},
     'JSUB': {'mnemonic': 'JSUB', 'format': 3, 'opcode': 0x48},
     'LDA': {'mnemonic': 'LDA', 'format': 3, 'opcode': 0x00},
     'LDB': {'mnemonic': 'LDB', 'format': 3, 'opcode': 0x68},
@@ -61,7 +63,6 @@ OPCODE = {
     'TIX': {'mnemonic': 'TIX', 'format': 3, 'opcode': 0x2c},
     'TIXR': {'mnemonic': 'TIXR', 'format': 2, 'opcode': 0xb8},
     'WD': {'mnemonic': 'WD', 'format': 3, 'opcode': 0xdc},
-    'HALT': {'mnemonic': 'HALT', 'format': 1, 'opcode': 0xe4}
 }
 DIRECTIVE = {
     'START': {'format': 2},
