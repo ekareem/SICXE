@@ -17,7 +17,7 @@ flagmap = {
     IMMIDIATE: '#',
     INDEX: ',X',
     BASE: '+[B]',
-    PC: '+[PC]',
+    PC: '+[P]',
     EXTENDED: '+',
 }
 

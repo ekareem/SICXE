@@ -98,20 +98,6 @@ CHRCMP		STA	BUFADR			.string addre
 	INDEX	RESW	1
 	NUM	RESW	1
 	
-. PIN1LEN	LDA	#PIN1
-. 	LDS	#CHRLEN
-. 	JSUB	STRLEN
-. halt	HALT
-
-. PIN1RD	LDA	#BUFFER
-. 	JSUB	READ
-. halt    HALT
-
-. PIN1CMP	LDA	#PIN1
-. 	LDS	#PIN2
-. 	LDT	#2
-. 	JSUB	STRCMP
-. 	HALT
 
 P1PR	LDA	#INTRO		.intro statement
 	JSUB	WRITE
