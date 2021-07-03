@@ -8,6 +8,6 @@ ADDLP	LDA	ALPHA,X	.Load Word from ALPHA into Register A
 	COMPR	X,T	.Compare new INDEX value to 15
 	JLT	ADDLP	.Loop if INDEX value is less than 15
 	HALT
-ALPHA	RESW	5
-BETA	RESW	5
+ALPHA	WORD	-1,-2,-3,-4,-5
+BETA	WORD	1,2,3,4,5
 GAMMA	RESW	5

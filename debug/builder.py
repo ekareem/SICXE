@@ -8,8 +8,8 @@ from debug.command.breakcommand import Break
 from debug.command.castcommand import DecToBase, DecToChar, DecToSignedWord, DecToUnsignedWord, DecToFloat, DecToInstr, \
     AddrToCharPoint, AddrToWordPoint, AddrToFloatPoint
 from debug.command.command import Command
-from debug.command.disascommand import Disas
-from debug.command.nextcommand import Run, Nexti, Step
+from debug.command.disascommand import Disas, Disasn
+from debug.command.nextcommand import Run, Nexti, Step, Symbols
 from debug.command.numbercommand import Number, StringToNum
 from debug.command.printcommand import PrintCommand, PrintRegisters, PrintMemory, PrintHelp
 from debug.command.registercommand import getRegisterVal, getMemoryVal
@@ -33,7 +33,7 @@ class Builder:
 
     def buildRun(self, cu: CU, bp: BreakPoint, show=False, symtab=None, datatab=None):
         ms = self.stack.pop() if len(self.stack) > 0 else None
-        r = Run(cu, bp, ms, show,symtab,datatab)
+        r = Run(cu, bp, ms, show, symtab, datatab)
         self.stack.append(r)
 
     def buildNexti(self, cu: CU, bp: BreakPoint, show=False, symtab=None, datatab=None):
@@ -55,6 +55,12 @@ class Builder:
         start = self.stack.pop() if len(self.stack) > 0 else None
         end = self.stack.pop() if len(self.stack) > 0 else None
         d = Disas(dis, start, end)
+        self.stack.append(d)
+
+    def buildDisasn(self, dis: Disasembler):
+        start = self.stack.pop() if len(self.stack) > 0 else None
+        end = self.stack.pop() if len(self.stack) > 0 else None
+        d = Disasn(dis, start, end)
         self.stack.append(d)
 
     def buildPrint(self):
@@ -128,9 +134,9 @@ class Builder:
         d = DecToFloat(num)
         self.stack.append(d)
 
-    def buildToInstr(self, cu: CU, symtab=None, datatab=None,br=[]):
+    def buildToInstr(self, cu: CU, symtab=None, datatab=None, br=[]):
         num = self.stack.pop() if len(self.stack) > 0 else None
-        d = DecToInstr(cu, num, symtab, datatab,br)
+        d = DecToInstr(cu, num, symtab, datatab, br)
         self.stack.append(d)
 
     def buildSet(self):
@@ -157,6 +163,9 @@ class Builder:
 
     def buildHelp(self, command):
         self.stack.append(PrintHelp(command))
+
+    def buildSymbols(self, symtab=None):
+        self.stack.append(Symbols(symtab))
 
     def getCommand(self):
         if len(self.stack) != 1:

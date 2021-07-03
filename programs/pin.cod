@@ -1,0 +1,164 @@
+block      address	code                label      operator operand        
+
+MAIN       000000	                    PIN        START    0              
+MAIN       000000	b410                STRLEN     CLEAR    X              
+MAIN       000002	0f201c                         STA      CHRPTR         
+MAIN       000005	7f2016                         STS      TEMP           
+MAIN       000008	b400                           CLEAR    A              
+MAIN       00000a	52a014              INCR       LDCH     @CHRPTR,X      
+MAIN       00000d	290000                         COMP     #0             
+MAIN       000010	332005                         JEQ      EOS            
+MAIN       000013	b810                           TIXR     X              
+MAIN       000015	3f2ff2                         J        INCR           
+MAIN       000018	122003              EOS        STX      @TEMP          
+MAIN       00001b	4f0000                         RSUB                    
+MAIN       00001e	                    TEMP       RESW     1              
+MAIN       000021	000000              CHRPTR     WORD     0              
+MAIN       000024	b410                READ       CLEAR    X              
+MAIN       000026	0f2022                         STA      STRADR         
+MAIN       000029	b400                           CLEAR    A              
+MAIN       00002b	e32020              TREAD      TD       STDIN          
+MAIN       00002e	332ffa                         JEQ      TREAD          
+MAIN       000031	db201a                         RD       STDIN          
+MAIN       000034	29000a                         COMP     #0x0A          
+MAIN       000037	332008                         JEQ      EOB            
+MAIN       00003a	56a00e                         STCH     @STRADR,X      
+MAIN       00003d	b810                           TIXR     X              
+MAIN       00003f	3f2fe9                         J        TREAD          
+MAIN       000042	510000              EOB        LDCH     #0x00          
+MAIN       000045	56a003                         STCH     @STRADR,X      
+MAIN       000048	4f0000                         RSUB                    
+MAIN       00004b	                    STRADR     RESW     1              
+MAIN       00004e	f1                  STDIN      BYTE     X'F1'          
+MAIN       00004f	b410                WRITE      CLEAR    X              
+MAIN       000051	0f201c                         STA      WSTRADR        
+MAIN       000054	b400                           CLEAR    A              
+MAIN       000056	e3201a              TWRITE     TD       STDOUT         
+MAIN       000059	332ffa                         JEQ      TWRITE         
+MAIN       00005c	52a011                         LDCH     @WSTRADR,X     
+MAIN       00005f	df2011                         WD       STDOUT         
+MAIN       000062	b810                           TIXR     X              
+MAIN       000064	290000                         COMP     #0x00          
+MAIN       000067	332003                         JEQ      WEOB           
+MAIN       00006a	3f2fe9                         J        TWRITE         
+MAIN       00006d	4f0000              WEOB       RSUB                    
+MAIN       000070	                    WSTRADR    RESW     1              
+MAIN       000073	05                  STDOUT     BYTE     X'05'          
+MAIN       000074	b410                STRCMP     CLEAR    X              
+MAIN       000076	0f2026                         STA      STR1           
+MAIN       000079	7f2026                         STS      STR2           
+MAIN       00007c	872026                         STT      CLEN           
+MAIN       00007f	b400                           CLEAR    A              
+MAIN       000081	52a01b              CFOR       LDCH     @STR1,X        
+MAIN       000084	0f2015                         STA      CTEMP          
+MAIN       000087	52a018                         LDCH     @STR2,X        
+MAIN       00008a	2b200f                         COMP     CTEMP          
+MAIN       00008d	332003                         JEQ      SAME           
+MAIN       000090	4f0000                         RSUB                    
+MAIN       000093	2e200f              SAME       TIX      @CLEN          
+MAIN       000096	3b2fe8                         JLT      CFOR           
+MAIN       000099	4f0000                         RSUB                    
+MAIN       00009c	                    CTEMP      RESW     1              
+MAIN       00009f	                    STR1       RESW     1              
+MAIN       0000a2	                    STR2       RESW     1              
+MAIN       0000a5	                    CLEN       RESW     1              
+MAIN       0000a8	0f2017              CHRCMP     STA      BUFADR         
+MAIN       0000ab	7f2017                         STS      INDEX          
+MAIN       0000ae	872017                         STT      NUM            
+MAIN       0000b1	b400                           CLEAR    A              
+MAIN       0000b3	07200f                         LDX      INDEX          
+MAIN       0000b6	52a009                         LDCH     @BUFADR,X      
+MAIN       0000b9	2b200c                         COMP     NUM            
+MAIN       0000bc	8f20d5                         JNE      FAIL           
+MAIN       0000bf	4f0000                         RSUB                    
+MAIN       0000c2	                    BUFADR     RESW     1              
+MAIN       0000c5	                    INDEX      RESW     1              
+MAIN       0000c8	                    NUM        RESW     1              
+MAIN       0000cb	01019b              P1PR       LDA      #INTRO         
+MAIN       0000ce	4b2f7e                         JSUB     WRITE          
+MAIN       0000d1	010270              PIN1RD     LDA      #BUFFER        
+MAIN       0000d4	4b2f4d                         JSUB     READ           
+MAIN       0000d7	010270              P1LEN      LDA      #BUFFER        
+MAIN       0000da	6d026d                         LDS      #CHRLEN        
+MAIN       0000dd	4b2f20                         JSUB     STRLEN         
+MAIN       0000e0	03218a                         LDA      CHRLEN         
+MAIN       0000e3	2b2181                         COMP     PIN1LEN        
+MAIN       0000e6	332003                         JEQ      PIN1CMP        
+MAIN       0000e9	3f20a8                         J        FAIL           
+MAIN       0000ec	01025a              PIN1CMP    LDA      #PIN1          
+MAIN       0000ef	6d0270                         LDS      #BUFFER        
+MAIN       0000f2	750267                         LDT      #PIN1LEN       
+MAIN       0000f5	4b2f7c                         JSUB     STRCMP         
+MAIN       0000f8	332003                         JEQ      P2PR           
+MAIN       0000fb	3f2096                         J        FAIL           
+MAIN       0000fe	0101db              P2PR       LDA      #P2INTRO       
+MAIN       000101	4b2f4b                         JSUB     WRITE          
+MAIN       000104	010270              PIN2RD     LDA      #BUFFER        
+MAIN       000107	4b2f1a                         JSUB     READ           
+MAIN       00010a	010270              P2LEN      LDA      #BUFFER        
+MAIN       00010d	6d026d                         LDS      #CHRLEN        
+MAIN       000110	4b2eed                         JSUB     STRLEN         
+MAIN       000113	032157                         LDA      CHRLEN         
+MAIN       000116	2b2151                         COMP     PIN2LEN        
+MAIN       000119	332003                         JEQ      PIN2CMP        
+MAIN       00011c	3f2075                         J        FAIL           
+MAIN       00011f	010270              PIN2CMP    LDA      #BUFFER        
+MAIN       000122	6d0001                         LDS      #1             
+MAIN       000125	750031                         LDT      #0x31          
+MAIN       000128	4b2f7d                         JSUB     CHRCMP         
+MAIN       00012b	010270                         LDA      #BUFFER        
+MAIN       00012e	6d0007                         LDS      #7             
+MAIN       000131	750032                         LDT      #0x32          
+MAIN       000134	4b2f71                         JSUB     CHRCMP         
+MAIN       000137	010270                         LDA      #BUFFER        
+MAIN       00013a	6d0008                         LDS      #8             
+MAIN       00013d	750033                         LDT      #0x33          
+MAIN       000140	4b2f65                         JSUB     CHRCMP         
+MAIN       000143	010270                         LDA      #BUFFER        
+MAIN       000146	6d0004                         LDS      #4             
+MAIN       000149	750034                         LDT      #0x34          
+MAIN       00014c	4b2f59                         JSUB     CHRCMP         
+MAIN       00014f	010270                         LDA      #BUFFER        
+MAIN       000152	6d0000                         LDS      #0             
+MAIN       000155	750035                         LDT      #0x35          
+MAIN       000158	4b2f4d                         JSUB     CHRCMP         
+MAIN       00015b	010270                         LDA      #BUFFER        
+MAIN       00015e	6d0002                         LDS      #2             
+MAIN       000161	750036                         LDT      #0x36          
+MAIN       000164	4b2f41                         JSUB     CHRCMP         
+MAIN       000167	010270                         LDA      #BUFFER        
+MAIN       00016a	6d0005                         LDS      #5             
+MAIN       00016d	750037                         LDT      #0x37          
+MAIN       000170	4b2f35                         JSUB     CHRCMP         
+MAIN       000173	010270                         LDA      #BUFFER        
+MAIN       000176	6d0003                         LDS      #3             
+MAIN       000179	750038                         LDT      #0x38          
+MAIN       00017c	4b2f29                         JSUB     CHRCMP         
+MAIN       00017f	010270                         LDA      #BUFFER        
+MAIN       000182	6d0006                         LDS      #6             
+MAIN       000185	750039                         LDT      #0x39          
+MAIN       000188	4b2f1d                         JSUB     CHRCMP         
+MAIN       00018b	010213                         LDA      #SUCCESS       
+MAIN       00018e	4b2ebe                         JSUB     WRITE          
+MAIN       000191	3f2006                         J        halt           
+MAIN       000194	010251              FAIL       LDA      #FMSG          
+MAIN       000197	4b2eb5                         JSUB     WRITE          
+MAIN       00019a	e4                  halt       HALT                    
+MAIN       00019b	506c6561736520696e70757420796f75722066697273742050494e20284e6f74652d2d746865206c656e677468206f6620796f75722050494e3c3d3135293a     INTRO      BYTE     C'Please input your first PIN (Note--the length of your PIN<=15):'
+MAIN       0001da	00                             BYTE     X'00'          
+MAIN       0001db	506c6561736520696e70757420796f7572207365636f6e642050494e206f66206c656e677468203920286f6e6c7920646967697473293a     P2INTRO    BYTE     C'Please input your second PIN of length 9 (only digits):'
+MAIN       000212	00                             BYTE     X'00'          
+MAIN       000213	4752454154212120596f752068617665206465636970686572656420626f7468206f6620796f75722050494e73207375636365737366756c6c792121     SUCCESS    BYTE     C'GREAT!! You have deciphered both of your PINs successfully!!'
+MAIN       00024f	0a                             BYTE     X'0A'          
+MAIN       000250	00                             BYTE     X'00'          
+MAIN       000251	4661696c757265      FMSG       BYTE     C'Failure'     
+MAIN       000258	0a                             BYTE     X'0A'          
+MAIN       000259	00                             BYTE     X'00'          
+MAIN       00025a	6b6334333630373135383239     PIN1       BYTE     C'kc4360715829'
+MAIN       000266	00                             BYTE     X'00'          
+MAIN       000267	00000c              PIN1LEN    WORD     *-PIN1-1       
+MAIN       00026a	000009              PIN2LEN    WORD     9              
+MAIN       00026d	000000              CHRLEN     WORD     0              
+MAIN       000270	                    BUFFER     RESB     100            
+MAIN       0002d4	                               END      P1PR           
+

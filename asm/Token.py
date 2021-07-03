@@ -122,7 +122,7 @@ class Format2rr(Opcode):
 
         if self.r1 is None or self.r2 is None:
             objectCode = self.line.block.section.objectCode
-            objectCode.setmod(token.replace('#', '').replace('@', ''), self.line.addr + 1, 1)
+            objectCode.setmod(token.replace('#', '').replace('@', '').replace('$', ''), self.line.addr + 1, 1)
         return codeF2(self.opcode, self.r1, self.r2, toInt)
 
 
@@ -160,7 +160,7 @@ class Format3m(Opcode):
         self.e = 1 if self.token.find('+') == 0 else self.e
         if ta is None:
             objectCode = self.line.block.section.objectCode
-            objectCode.setmod(token.replace('#', '').replace('@', ''), self.line.addr + 1, 3 if self.e == 0 else 5)
+            objectCode.setmod(token.replace('#', '').replace('@', '').replace('$', ''), self.line.addr + 1, 3 if self.e == 0 else 5)
 
         return codeF3(pc, base, ta, self.opcode, mode, self.x, self.b, self.p, self.e, toInt)
 
@@ -169,6 +169,8 @@ class Format3m(Opcode):
             return 0b01
         if token.find("@") == 0:
             return 0b10
+        if token.find("$") == 0:
+            return 0b00
         return 0b11
 
 
@@ -198,6 +200,8 @@ class Format3(Opcode):
             return 0b01
         if token.find("@") == 0:
             return 0b10
+        if token.find("$") == 0:
+            return 0b00
         return 0b11
 
 
@@ -216,7 +220,7 @@ class Operand(Token):
         if self.token.replace('=', '') in OPCODE or self.token.replace('=', '') in DIRECTIVE:
             raise Exception(f'{self.token} is a used key word')
 
-        if self.token.replace("#", '').replace("@", '').find('=') == 0:
+        if self.token.replace("#", '').replace("@", '').replace('$', '').find('=') == 0:
             self.line.block.section.littab[self.token] = Literal(self.token, value=self.token.replace("=", ''))
         elif len(self.token) > 0 and self.token[:1].isalpha() and self.token.isalnum():
             self.line.block.section.symtab[self.token] = Symbol(LOCAL, self.token)
@@ -224,8 +228,7 @@ class Operand(Token):
     def execute(self, nbits, asbyte, asFloat=False):
 
         symtab = self.line.block.section.symtab
-        token = self.token.replace("#", '')
-        token = token.replace("@", '')
+        token = self.token.replace("#", '').replace("@", '').replace('$', '')
         if token == '*':
             return self.line.addr
         if token in symtab.table:
@@ -262,10 +265,6 @@ class Operands(Token):
     def onCreate(self, create=True):
         super(Operands, self).onCreate()
         for token in tokenize(self.token, (",",)):
-            # token = token.replace("#", '')
-            # token = token.replace("@", '')
-            # index = max(token.find('+'), token.find('-'))
-            # if index != -1 and index != 0:
             if isExpression(token):
                 o = Expr(token, self.line)
             else:
@@ -298,14 +297,14 @@ class Expr(Operand):
         super().__init__(token, line)
 
     def onCreate(self, create=True):
-        postfix = infixToPostfixx(self.token.replace('#', '').replace('@', ''))
+        postfix = infixToPostfixx(self.token.replace('#', '').replace('@', '').replace('$', ''))
 
         for token in postfix:
             if len(token) > 0 and token.isalnum() and not isdigit(token, None):
                 self.line.block.section.symtab[token] = Symbol(LOCAL, self.token)
 
     def execute(self, nbits, asbyte, asFloat=False):
-        postfix = infixToPostfixx(self.token.replace('#', '').replace('@', ''))
+        postfix = infixToPostfixx(self.token.replace('#', '').replace('@', '').replace('$', ''))
         stack = []
         hasNone = False
         for i, token in enumerate(postfix):
@@ -436,25 +435,40 @@ class Byte(Directive):
     def length(self):
         operands = self.line.operands
         operand = 0
-        if operands is None or len(operands.operands) != 1:
-            operand = bytearray()
-        else:
-            operand = operands.operands[0].execute(8, True)
-        return len(operand) * 1
+        length = 0
+        if operands is None or len(operands.operands) == 0:
+            raise Exception('missing operand')
+        for i in range(len(operands.operands)):
+            operand = operands.operands[i].execute(8, True)
+            length += len(operand) * 1
+        return length
 
     def getObjectCode(self, toInt=None):
-        length = self.length()
-        addr = self.line.addr
-        # for i in range(addr, addr + length):
-        self.line.block.section.datum[addr] = [length, 'b']
 
         operands = self.line.operands
-        operand = 0
-        if operands is None or len(operands.operands) != 1:
-            operand = bytearray()
-        else:
-            operand = operands.operands[0].execute(8, True)
-        return operand
+        if operands is None or len(operands.operands) == 0:
+            raise Exception('missing operand')
+
+        code = bytearray()
+
+        for i in range(len(operands.operands)):
+            byte = operands.operands[i].execute(8, True)
+            self.line.block.section.datum[self.line.addr + (i * 1)] = [len(byte), 'b']
+            code += byte if byte is not None else bytearray(1)
+
+        # length = self.length()
+        # addr = self.line.addr
+        # # for i in range(addr, addr + length):
+        # self.line.block.section.datum[addr] = [length, 'b']
+        #
+        # operands = self.line.operands
+        # operand = 0
+        # if operands is None or len(operands.operands) == 0:
+        #     operand = bytearray()
+        # else:
+        #     operand = operands.operands[0].execute(8, True)
+        # return operand
+        return code
 
 
 class Word(Directive):
@@ -463,18 +477,25 @@ class Word(Directive):
 
     def length(self):
         operands = self.line.operands
-        if operands is None or len(operands.operands) != 1:
+        if operands is None or len(operands.operands) == 0:
             raise Exception('missing operand')
         # operand = operands.operands[0].execute(24, False)
-        return 3
+        # print(self.line.label,self.token,self.line.operands, len(operands.operands) * 3)
+        return len(operands.operands) * 3
 
     def getObjectCode(self, toInt=None):
-        self.line.block.section.datum[self.line.addr] = [SICXE_SIZE_BYTE_WORD, 'w']
         operands = self.line.operands
-        if operands is None or len(operands.operands) != 1:
+        if operands is None or len(operands.operands) == 0:
             raise Exception('missing operand')
-        byte = operands.operands[0].execute(24, True)
-        return byte if byte is not None else bytearray(3)
+
+        code = bytearray()
+
+        for i in range(len(operands.operands)):
+            byte = operands.operands[i].execute(24, True)
+            self.line.block.section.datum[self.line.addr + (i * 3)] = [SICXE_SIZE_BYTE_WORD, 'w']
+            code += byte if byte is not None else bytearray(3)
+
+        return code
 
 
 class Float(Directive):
@@ -483,17 +504,30 @@ class Float(Directive):
 
     def length(self):
         operands = self.line.operands
-        if operands is None or len(operands.operands) != 1:
+        if operands is None or len(operands.operands) == 0:
             raise Exception('missing operand')
         # operand = operands.operands[0].execute(48, True)
-        return 6
+        return len(operands.operands) * 6
 
     def getObjectCode(self, toInt=False):
-        self.line.block.section.datum[self.line.addr] = [SICXE_SIZE_BYTE_FLOAT, 'f']
+        # self.line.block.section.datum[self.line.addr] = [SICXE_SIZE_BYTE_FLOAT, 'f']
+        # operands = self.line.operands
+        # if operands is None or len(operands.operands) != 1:
+        #     raise Exception('missing operand')
+        # return operands.operands[0].execute(48, True, asFloat=True)
+
         operands = self.line.operands
-        if operands is None or len(operands.operands) != 1:
+        if operands is None or len(operands.operands) == 0:
             raise Exception('missing operand')
-        return operands.operands[0].execute(48, True, asFloat=True)
+
+        code = bytearray()
+
+        for i in range(len(operands.operands)):
+            byte = operands.operands[i].execute(48, True, asFloat=True)
+            self.line.block.section.datum[self.line.addr + (i * 6)] = [SICXE_SIZE_BYTE_FLOAT, 'f']
+            code += byte if byte is not None else bytearray(6)
+
+        return code
 
 
 class Ltorg(Directive):

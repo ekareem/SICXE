@@ -25,15 +25,15 @@ STRLEN		CLEAR	X			.get registers ready
 READ		CLEAR	X
 		STA	STRADR			.buffer addres
 		CLEAR	A
-	TREAD	TD	STDIN
+	TREAD	TD	STDIN			.test device
 		JEQ	TREAD
-		RD	STDIN
+		RD	STDIN			.read input buffer
 		COMP	#0x0A
 		JEQ	EOB
-		STCH	@STRADR,X
+		STCH	@STRADR,X	
 		TIXR	X	
-		J	TREAD
-	EOB	LDCH	#0x00
+		J	TREAD			
+	EOB	LDCH	#0x00			
 		STCH	@STRADR,X
 		RSUB
 	STRADR	RESW	1

@@ -1,5 +1,5 @@
 OPCODE_FLAG = ['', '+']
-SYMBOL_FLAG = ['', '#', '@']
+SYMBOL_FLAG = ['', '#', '@', '$']
 
 OPCODE = {
     'ADD': {'mnemonic': 'ADD', 'format': 3, 'opcode': 0x18},

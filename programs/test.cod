@@ -1,0 +1,7 @@
+block      address	code                label      operator operand        
+
+MAIN       000000	00000c              FIRST      LDA      $NUM           
+MAIN       000003	040000                         LDX      $0             
+MAIN       000006	2c000c                         TIX      $NUM           
+MAIN       000009	18800c                         ADD      $NUM,X         
+MAIN       00000c	000001000002000003000004     NUM        WORD     1,2,3,4

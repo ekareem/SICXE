@@ -33,7 +33,7 @@ def codeF3(pc: int,
     disp = ta
     if ta is None:
         disp = 0
-    elif mode == 0b01:
+    elif mode == 0b01 or mode == 00:
         disp = ta
     elif b == 0 and e == 0:
         disp = ta - pc
@@ -60,7 +60,7 @@ def codeF3(pc: int,
 
     opni = f'{opcode:0>8b}'[:6] + f'{mode:0>2b}'
 
-    nbits = 12 if e == 0 else 20
+    nbits = 15 if mode == 0b00 else 12 if e == 0 else 20
     disprofm = "{:0>" + str(nbits) + "b}"
 
     dispstr = disprofm.format(disp)
@@ -68,8 +68,8 @@ def codeF3(pc: int,
     if len(dispstr) > nbits:
         dispstr = dispstr[len(dispstr) - nbits:len(dispstr)]
 
-    binary = f'{opni}{x:0>1b}{b:0>1b}{p:0>1b}{e:0>1b}{dispstr}'
-    nbyte = 3 if e == 0 else 4
+    binary = f'{opni}{x:0>1b}{dispstr}' if mode == 0b00 else f'{opni}{x:0>1b}{b:0>1b}{p:0>1b}{e:0>1b}{dispstr}'
+    nbyte = 3 if mode == 0b00 else 3 if e == 0 else 4
     hexform = "{:0>" + str(nbyte * 2) + "X}"
 
     if toInt is None:

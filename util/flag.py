@@ -15,6 +15,7 @@ flagmap = {
     DIRECT: '',
     INDIRECT: '@',
     IMMIDIATE: '#',
+    SIC: '$',
     INDEX: ',X',
     BASE: '+[B]',
     PC: '+[P]',
@@ -43,11 +44,11 @@ def isIndexed(flag: int):
 
 
 def isBase(flag: int):
-    return flag & BASE == BASE
+    return False if isSic(flag) else flag & BASE == BASE
 
 
 def isPc(flag: int):
-    return flag & PC == PC
+    return False if isSic(flag) else flag & PC == PC
 
 
 def isExtended(flag: int):
@@ -106,9 +107,9 @@ def nixbpeToStringInstr(instr: bytearray):
     n = 'n' if isIndirectInstr(instr) or isDirectInstr(instr) else '-'
     i = 'i' if isImidiateInstr(instr) or isDirectInstr(instr) else '-'
     x = 'x' if isIndexedInstr(instr) else '-'
-    b = 'b' if isBaseInstr(instr) else '-'
-    p = 'p' if isPcInstr(instr) else '-'
-    e = 'e' if isExtendedInstr(instr) else '-'
+    b = 'b' if isBaseInstr(instr) else ' ' if isSicInstr(instr) else '-'
+    p = 'p' if isPcInstr(instr) else ' ' if isSicInstr(instr) else '-'
+    e = 'e' if isExtendedInstr(instr) else ' ' if isSicInstr(instr) else '-'
     return f'{n}{i}{x}{b}{p}{e}'
 
 

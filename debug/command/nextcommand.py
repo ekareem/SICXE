@@ -1,11 +1,25 @@
 import time
-from typing import List
+from typing import List, Dict
 
 from debug.disas import createInstruction
 from debug.breakpoint import BreakPoint
 from debug.command.command import Command, UnaryCommand
 from util import SICXE_SIZE_MEMORY, JSUB, getopcode, RSUB, getFormat
 from vm import CU, SICXE_NUM_REGISTER_PC, SICXE_NUM_REGISTER_L
+
+
+class Symbols(Command):
+    def __init__(self, symtab=None):
+        super().__init__()
+        self.symtab = symtab
+
+    def execute(self, inputs=None) -> any:
+        a = {}
+        string = ''
+        for i in self.symtab.table:
+            if self.symtab[i].addr is not None:
+                string += f'{i:<12} | 0x{self.symtab[i].addr:<12x}\n'
+        return string
 
 
 class Nexti(UnaryCommand):

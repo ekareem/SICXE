@@ -1,0 +1,16 @@
+block      address	code                label      operator operand        
+
+MAIN       000000	6d0003                         LDS      #3             
+MAIN       000003	75000f                         LDT      #15            
+MAIN       000006	050000                         LDX      #0             
+MAIN       000009	03a00e              ADDLP      LDA      ALPHA,X        
+MAIN       00000c	1ba01a                         ADD      BETA,X         
+MAIN       00000f	0fa026                         STA      GAMMA,X        
+MAIN       000012	9041                           ADDR     S,X            
+MAIN       000014	a015                           COMPR    X,T            
+MAIN       000016	3b2ff0                         JLT      ADDLP          
+MAIN       000019	e4                             HALT                    
+MAIN       00001a	fffffffffffefffffdfffffcfffffb     ALPHA      WORD     -1,-2,-3,-4,-5 
+MAIN       000029	000001000002000003000004000005     BETA       WORD     1,2,3,4,5      
+MAIN       000038	                    GAMMA      RESW     5              
+MAIN       000047	                    TWO        EQU      2              

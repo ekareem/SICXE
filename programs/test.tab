@@ -1,0 +1,14 @@
+name       address value     
+A          000000           const
+X          000001           const
+L          000002           const
+P          000008           const
+SW         000009           const
+B          000003           const
+S          000004           const
+T          000005           const
+F          000006           const
+FIRST      000000           addr
+NUM        00000c           addr
+
+

@@ -63,6 +63,8 @@ class Debugger:
                     self.builder.buildBreak(self.bp)
                 elif token.lower() in tk.DISAS:
                     self.builder.buildDisas(self.dis)
+                elif token.lower() in tk.DISASN:
+                    self.builder.buildDisasn(self.dis)
                 elif token.lower() in tk.PRINT:
                     self.builder.buildPrint()
                 elif token.lower() in tk.PRINTRRGISTERS:
@@ -90,13 +92,15 @@ class Debugger:
                 elif token.lower() in tk.TOFLOAT:
                     self.builder.buildDecToFloat()
                 elif token.lower() in tk.TOINSTRUCTION:
-                    self.builder.buildToInstr(self.cu, self.symtab, self.datatab,self.dis.br)
+                    self.builder.buildToInstr(self.cu, self.symtab, self.datatab, self.dis.br)
                 elif token.lower() in tk.SET:
                     self.builder.buildSet()
                 elif token.lower() in tk.SETCC:
                     self.builder.buildSetCC()
                 elif token.lower() in tk.SETCH:
                     self.builder.buildSetCH()
+                elif token.lower() in tk.SYMBOLS:
+                    self.builder.buildSymbols(self.symtab)
                 elif isExpression(token):
                     self.builder.buildExpr(self.cu, token, self.symtab)
                 else:

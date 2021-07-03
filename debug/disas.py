@@ -4,7 +4,7 @@ from util import getFormat, getMnemonicInstr, getopcode, opcodes, F1, getRegiste
     getRegister2, strformat, F2n, F2rn, F2rr, F2r, flagmap, EXTENDED, isExtendedInstr, F3, IMMIDIATE, isImidiateInstr, \
     INDIRECT, isIndirectInstr, isIndexedInstr, isBaseInstr, isPcInstr, INDEX, BASE, PC, getDisp, F3m, \
     nixbpeToStringInstr, getTargetAddress, INT, isDirectInstr, isSicInstr, bytearrayToInt, bytearrayToFloat, \
-    SICXE_SIZE_BIT_EXPONENT, SICXE_SIZE_BIT_MANTISSA,decToInt
+    SICXE_SIZE_BIT_EXPONENT, SICXE_SIZE_BIT_MANTISSA, decToInt, SIC
 from vm import CU, SICXE_NUM_REGISTER_PC, register
 
 
@@ -17,13 +17,13 @@ class Instruction:
         self.form = strformat[opcodes[getopcode(self.instr)]['F']]
         self.symtab = symtab
 
-    def getSymbol(self, val, indirect='', immidiate='', index='', toTA=False):
+    def getSymbol(self, val, sic='', indirect='', immidiate='', index='', toTA=False):
         if self.symtab is not None:
             for sym in self.symtab.table:
                 if self.symtab.table[sym].addr == val and \
                         self.symtab.table[sym].group == ADDR:
-                    return f'{indirect}{immidiate}{sym}{index}'
-        return f'{indirect}{immidiate}0x{val:X}{index}' if toTA else ''
+                    return f'{sic}{indirect}{immidiate}{sym}{index}'
+        return f'{sic}{indirect}{immidiate}0x{val:X}{index}' if toTA else ''
 
     def gethex(self):
         instr = ''
@@ -88,10 +88,10 @@ class Word(Data):
         super().__init__(cu, loc, instr, length, symtab)
 
     def getDisas(self):
-        #f'{hex(bytearrayToInt(self.instr, False)):<15}'
+        # f'{hex(bytearrayToInt(self.instr, False)):<15}'
         return super(Word,
-                     self).getDisas()  + f'0x{bytearrayToInt(self.instr, False):0>6X}' \
-               +f'{"":<7}'+ f'{bytearrayToInt(self.instr, False):<1}' + ' | ' \
+                     self).getDisas() + f'0x{bytearrayToInt(self.instr, False):0>6X}' \
+               + f'{"":<7}' + f'{bytearrayToInt(self.instr, False):<1}' + ' | ' \
                + f'{bytearrayToInt(self.instr, True):<2} '
 
 
@@ -124,7 +124,8 @@ class InstructionF1(Instruction):
         super().__init__(cu, loc, instr, symtab)
 
     def getDisas(self):
-        return f'{"":<6}' + ' ' + self.form.format(self.getSymbol(self.loc),getMnemonicInstr(self.instr)) #f'{self.getSymbol(self.loc):<15}' + getMnemonicInstr(self.instr)
+        return f'{"":<6}' + ' ' + self.form.format(self.getSymbol(self.loc), getMnemonicInstr(
+            self.instr))  # f'{self.getSymbol(self.loc):<15}' + getMnemonicInstr(self.instr)
 
 
 class InstructionF2(Instruction):
@@ -185,17 +186,20 @@ class InstructionF3m(InstructionF3):
     def getDisas(self):
         extended = flagmap[EXTENDED] if isExtendedInstr(self.instr) else ' '
         immidiate = flagmap[IMMIDIATE] if isImidiateInstr(self.instr) else ''
+        sic = flagmap[SIC] if isSicInstr(self.instr) else ''
         inDirect = flagmap[INDIRECT] if isIndirectInstr(self.instr) else ''
         index = flagmap[INDEX] if isIndexedInstr(self.instr) else ''
         base = flagmap[BASE] if isBaseInstr(self.instr) else ''
         pc = flagmap[PC] if isPcInstr(self.instr) else ''
-        operand = self.signedDisp() #getDisp(self.instr)
+        operand = self.signedDisp()  # getDisp(self.instr)
         sign = '-' if operand < 0 else ''
         nixpbe = nixbpeToStringInstr(self.instr)
         p = INT(self.loc + len(self.instr), 24, False)
         ta = getTargetAddress(self.instr, p, register.B, register.X, self.cu.mem, isDisas=True)
         out = nixpbe + ' ' + self.form.format(self.getSymbol(self.loc, toTA=False), extended, self.mnemonic,
-                                              self.getSymbol(ta.dec, inDirect, immidiate, index, toTA=True), immidiate,
+                                              self.getSymbol(ta.dec, sic, inDirect, immidiate, index, toTA=True),
+                                              sic,
+                                              immidiate,
                                               inDirect,
                                               sign,
                                               abs(operand),
@@ -206,9 +210,11 @@ class InstructionF3m(InstructionF3):
 
     def signedDisp(self):
         if isExtendedInstr(self.instr):
-            return decToInt(getDisp(self.instr),20,signed=True)
-        return  decToInt(getDisp(self.instr),12,signed=True)
-    
+            return decToInt(getDisp(self.instr), 20, signed=True if isPcInstr(self.instr) else False)
+        if isSicInstr(self.instr):
+            return decToInt(getDisp(self.instr), 15, signed=False)
+        return decToInt(getDisp(self.instr), 12, signed=True if isPcInstr(self.instr) else False)
+
     def ta(self, ta):
         mode = ['', '']
         if isDirectInstr(self.instr) or isSicInstr(self.instr):
@@ -257,12 +263,12 @@ def getInstructions(cu: CU, symtab: SYMTAB = None, rang=None, datatab=None):
     return instructions
 
 
-def getInstruction(pc, cu: CU, symtab: SYMTAB = None, datatab=None,isDat = True):
+def getInstruction(pc, cu: CU, symtab: SYMTAB = None, datatab=None, isDat=True):
     instr = cu.mem.get(pc, 2, asbytearr=True)
     length = getFormat(instr)
 
     isData = False
-    if datatab is not None :
+    if datatab is not None:
         if pc in datatab and isDat:
             length = datatab[pc][0]
             isData = True
@@ -277,8 +283,8 @@ class Disasembler:
         self.symtab = symtab
         self.datatab = datatab
 
-    def disas(self, rang=None):
-        self.instructions = getInstructions(self.cu, self.symtab, rang, datatab=self.datatab)
+    def disas(self, rang=None,data = True):
+        self.instructions = getInstructions(self.cu, self.symtab, rang, datatab=self.datatab if data else None)
 
     def __str__(self):
         string = f'{" ":<2}{"ADDR":<7}\t{"HEXCODE":<15} {"OPCODE":<2}\t{"MODE":<7}{"LABEL":<16}{"MNEMON":<9}{"OPERAND":15}{"TA"}\n\n'
@@ -291,7 +297,8 @@ class Disasembler:
 
 def isExpression(token):
     for c in token:
-        if not (c == '+' or c == '-' or c == '*' or c == '/' or c == '%' or c == '(' or c == ')' or  c == '[' or c == ']' or c == '.'  or c == '$' or c.isalnum()):
+        if not (
+                c == '+' or c == '-' or c == '*' or c == '/' or c == '%' or c == '(' or c == ')' or c == '[' or c == ']' or c == '.' or c == '$' or c.isalnum()):
             return False
     index = max(token.find('+'), token.find('-'), token.find('*'), token.find('/'), token.find('%'))
     return index != -1 and index != 0
