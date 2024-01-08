@@ -294,7 +294,7 @@ class TextRecords:
         else:
             t = self.textRecords[len(self.textRecords) - 1]
 
-        if not t.columns[3].canFit(data, nhbyte=6):
+        if not t.columns[3].canFit(data, nhbyte):
             t = TextRecord()
             t.setStart(self.addr)
             self.textRecords.append(t)
