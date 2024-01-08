@@ -131,7 +131,7 @@ class HeaderRecord(Record):
 
 
 class TextRecord(Record):
-    def __init__(self, lengths=(1, 6, 2, 62)):
+    def __init__(self, lengths=(1, 6, 2, 60)):
         super().__init__(lengths)
         self.set(0, 'T')
 
