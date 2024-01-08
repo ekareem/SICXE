@@ -85,7 +85,7 @@ class Line:
         c = bytearrayToInt(self.code, False)
         f = '{:0>' + str(l) + 'x}'
         g = '{:>' + str(20 - l) + '}' if 20 - l >=0  else '{:>5}'
-        return f'{str(self.block.name):<10} {self.addr:0>6X}\t{f.format(c) if len(self.code) > 0 else ""}{g.format("")}{str(self.label if not self.label is None else ""):<10} {str(self.operator):<8} {str(self.operands if not self.operands is None else ""):<15}'
+        return f'{str(self.block.name):<10} {self.addr:0>6X}\t{f.format(c) if len(self.code) > 0 else ""}{g.format("")}{str("" if self.label is None else self.label):<10}{"+" if str(self.operator)[0] == "+" else " "}{str(str(self.operator)[1:] if str(self.operator)[0] == "+" else self.operator):<8}{str(self.operands)[0] if str(self.operands)[0] == "#" or str(self.operands)[0] == "=" or str(self.operands)[0] == "@" else " "}{str(str(self.operands)[1:] if str(self.operands)[0] == "#" or str(self.operands)[0] == "=" or str(self.operands)[0] == "@" else "" if self.operands is None else self.operands):<15}'
 
     def __str__(self):
         # l = len(self.code) * 2
