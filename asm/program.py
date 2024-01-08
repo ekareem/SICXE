@@ -48,7 +48,7 @@ class Program:
         string = ''
         for s in self.sections:
             if s.line is not None:
-                string += s.line.toStr() + '\n'
+                string += s.line.toStr()
 
         file = open(f, "w+")
         file.write(string)
@@ -56,7 +56,7 @@ class Program:
     def getObjectCode(self):
         string = ''
         for s in self.sections:
-            string += str(s.objectCode) + '\n\n'
+            string += str(s.objectCode) + '\n'
         return string
 
 
