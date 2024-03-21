@@ -6,6 +6,7 @@ from asm.Line import Line
 from asm.block import Block
 from asm.table import SYMTAB, LITTAB, BLOCTAB
 from asm.lexutil import getTail, LOCAL, isdigit, isFloat, isExpression
+from asm import Token
 from loader.objectCode import ObjectCode
 
 
@@ -101,7 +102,7 @@ class Section:
         l = self.line
         self.objectCode.setHeaderName(self.name)
         while l is not None:
-            self.objectCode.addTextFromByteArray(l.addr, l.code)
+            self.objectCode.addTextFromByteArray(l.addr, l.code, isinstance(l.operator, Token.Byte))
             l = l.child
         self.objectCode.e.first(self.firstExeAddr)
 

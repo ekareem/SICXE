@@ -391,6 +391,7 @@ class Start(Directive):
             self.line.block.section.name = self.line.label.token
             self.line.block.section.symtab[self.line.label.token].group = CONST
 
+        operand = int(str(operand), 16)
         self.line.block.section.start = operand
         headblock: 'Block' = getHead(self.line.block)
         self.line.block.section.block.start = operand

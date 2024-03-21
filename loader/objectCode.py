@@ -108,7 +108,7 @@ class Record:
     def __str__(self):
         string = ''
         for column in self.columns:
-            string += str(column)
+            string += str(column).rstrip()
         return string
 
     def __repr__(self):
@@ -131,7 +131,7 @@ class HeaderRecord(Record):
 
 
 class TextRecord(Record):
-    def __init__(self, lengths=(1, 6, 2, 62)):
+    def __init__(self, lengths=(1, 6, 2, 60)):
         super().__init__(lengths)
         self.set(0, 'T')
 
@@ -148,12 +148,18 @@ class TextRecord(Record):
             newnhbyte -= self.columns[3].length - len(self.columns[3].value)
         insertnhbyte = min(self.columns[3].length - len(self.columns[3].value), nhbyte)
         form = "{:0>" + str(nhbyte) + "x}"
-        ndata = str(form.format(data))[:insertnhbyte]
-        ndata = int(ndata, 16) if type(data) == int else data
+        # Now, there is a chance the data is byte array with more than 64 bytes.
+        # Such bytearray will cause overflow when trying to convert it into integer and pass it to form.
+        # Thus, in cases where data is bytearray, simply concatenate its elements.
+        data = ''.join('{:02x}'.format(b) for b in data) if type(data) == bytearray else str(form.format(data))
+        ndata = data[:insertnhbyte]
+        if type(data) == int:
+            ndata = int(ndata, 16)
+
         self.addHex(3, ndata, nhbyte=insertnhbyte)
         self.setLength()
 
-        return [addr + math.ceil(insertnhbyte / 2), str(form.format(data))[insertnhbyte:], newnhbyte]
+        return [addr + math.ceil(insertnhbyte / 2), data[insertnhbyte:], newnhbyte]
 
 
 class DefRecord(Record):
@@ -281,7 +287,7 @@ class TextRecords:
             l += math.ceil(len(textRecord.columns[3].value) / 2)
         return l
 
-    def add(self, addr, data, nhbyte):
+    def add(self, addr, data, nhbyte, isByte: bool=False):
         if type(addr) == str:
             addr = int(addr, 16)
 
@@ -294,7 +300,7 @@ class TextRecords:
         else:
             t = self.textRecords[len(self.textRecords) - 1]
 
-        if not t.columns[3].canFit(data, nhbyte=6):
+        if not isByte and not t.columns[3].canFit(data, nhbyte):
             t = TextRecord()
             t.setStart(self.addr)
             self.textRecords.append(t)
@@ -335,19 +341,19 @@ class ObjectCode:
         self.h.setStart(addr)
         self.e.first(addr)
 
-    def addText(self, addr, data, nhbyte: int):
+    def addText(self, addr, data, nhbyte: int, isByte: bool=False):
         if self.t.length() == 0:
             self.setStart(addr)
-        a = self.t.add(addr, data, nhbyte)
+        a = self.t.add(addr, data, nhbyte, isByte)
         self.h.setLength(self.t.length())
         if len(a[1]) != 0:
-            self.addText(a[0], int(a[1], 16), a[2])
+            self.addText(a[0], int(a[1], 16), a[2], isByte)
         return a
 
-    def addTextFromByteArray(self, addr, bytes: bytearray):
-        for i in bytes:
-            self.addText(addr, i, 2)
-            addr += 1
+    def addTextFromByteArray(self, addr, bytes: bytearray, isByte: bool=False):
+        nhbytes = 2 * len(bytes)
+        if (nhbytes > 0):
+            self.addText(addr, bytes, nhbytes, isByte)
 
     def __str__(self):
         return f'{self.h}\n{self.d}{self.r}{self.t}{self.m}{self.e}'
